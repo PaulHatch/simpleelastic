@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,10 +13,16 @@ using System.Threading.Tasks;
 
 namespace Elasticsearch.LiteClient
 {
+    /// <summary>
+    /// A light-weight client for connecting to an elasticsearch cluster.
+    /// </summary>
     public sealed class ElasticClient
     {
         private const string _mediaType = "application/json";
-        private readonly JsonSerializerSettings _defaultJsonSettings;
+        private static readonly JsonSerializerSettings _defaultJsonSettings = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
         private static readonly Lazy<HttpClient> _defaultClient = new Lazy<HttpClient>(CreateClient);
         private static HttpClient CreateClient()
         {
@@ -35,14 +42,33 @@ namespace Elasticsearch.LiteClient
             _hostProvider = config.HostProvider ?? throw new ArgumentNullException($"{nameof(ClientOptions.HostProvider)} cannot be null", nameof(config));
         }
 
-        public async Task<SearchResult<T>> SearchAsync<T>(string index, object query, CancellationToken cancel = default(CancellationToken))
+        /// <summary>
+        /// Executes a _search with the specified parameters.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The index type model to use, this should support the mapping from the '_source'
+        /// document object.
+        /// </typeparam>
+        /// <param name="index">The index (or indexes or index pattern) to search.</param>
+        /// <param name="query">The query object.</param>
+        /// <param name="options">The options for the search query.</param>
+        /// <param name="cancel">A cancellation token for the request.</param>
+        /// <returns>The result of the requested search.</returns>
+        public async Task<SearchResult<T>> SearchAsync<T>(string index, object query, object options = null, CancellationToken cancel = default(CancellationToken))
         {
-            var requestUri = _hostProvider.Next();
+            if (options != null)
+            {
+
+            }
+
+            var requestUri = new Uri(_hostProvider.Next() + $"{index}/_search");
             var result = await MakeRequest<SearchResponse<T>>(HttpMethod.Post, requestUri, query, cancel);
 
 
             return new SearchResult<T>
             {
+                Hits = result.Hits.Hits,
+                Total = result.Hits.Total
             };
         }
 
