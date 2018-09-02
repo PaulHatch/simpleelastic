@@ -51,5 +51,51 @@ namespace Elasticsearch.LiteClient.Test
             Assert.Equal("test", doc.Test["obj.1.c.0"]);
             Assert.Equal(3L, doc.Test["obj.1.c.1"]);
         }
+
+        [Fact]
+        public void CanSerializeObjectQueryString()
+        {
+            var request = new { a = true };
+            var result = QueryStringParser.GetQueryString(request);
+            Assert.Equal("?a=true", result);
+        }
+
+        [Fact]
+        public void CanSerializeMultipleObjectQueryString()
+        {
+            var request = new { a = true, b = 2, c = "test" };
+            var result = QueryStringParser.GetQueryString(request);
+            Assert.Equal("?a=true&b=2&c=test", result);
+        }
+
+        [Fact]
+        public void EmptyObjectsCreateNoQueryString()
+        {
+            var request = new { };
+            var result = QueryStringParser.GetQueryString(request);
+            Assert.Equal(String.Empty, result);
+        }
+
+        [Fact]
+        public void MapSerializationTest()
+        {
+            dynamic query = new Map {
+                { "query", new { match_all = new {} }}
+            };
+            query.size = 10;
+            query["from"] = 0;
+
+            var json = JsonConvert.SerializeObject(query);
+
+            // Generate the object we expect
+            var expectedJson = JsonConvert.SerializeObject(new
+            {
+                query = new { match_all = new { } },
+                size = 10,
+                from = 0
+            });
+
+            Assert.Equal(expectedJson, json);
+        }
     }
 }

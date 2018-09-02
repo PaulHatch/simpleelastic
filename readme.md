@@ -13,6 +13,9 @@ correctly formed queries.
 
 ## The Map Class
 
+The `Map` class is provided to make writing queries with fields which are not valid
+C# field name easier.
+
 Consider the following search query:
 
 ```json
@@ -38,8 +41,7 @@ new {
 ```
 
 We could use a `Dictionary<string, object>` here, but this client supplies a `Map` 
-class which it is shorter to type and makes the resulting query easier to read, and
-implements DynamicObject, allowing direct property assignment.
+class which it is shorter to type and makes the resulting query easier to read.
 
 With the Map class, our query now looks like this:
 
@@ -52,6 +54,26 @@ new {
     }
 }
 ```
+
+The Map class also implements DynamicObject, allowing usage as a dyanmic object, 
+`IEnumerable` and `Add(string, object)` for collection initialization, and a property
+name object, resulting in quite flexible usage options:
+
+```csharp
+
+// Collection initialization
+dynamic query = new Map { 
+    { "query", new { match_all = new {} }} 
+};
+
+// Setting dynamic fields
+query.size = 10;
+
+// Indexer
+query["from"] = 0;
+
+```
+
 
 # Version Support
 
