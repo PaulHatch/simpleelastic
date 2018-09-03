@@ -1,4 +1,4 @@
-﻿using Elasticsearch.LiteClient.Models;
+﻿using SimpleElastic.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
@@ -6,17 +6,18 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Elasticsearch.LiteClient
+namespace SimpleElastic
 {
     /// <summary>
     /// A light-weight client for connecting to an elasticsearch cluster.
     /// </summary>
-    public sealed class ElasticClient
+    public sealed class SimpleElasticClient
     {
         private const string _mediaType = "application/json";
         private static readonly JsonSerializerSettings _defaultJsonSettings = new JsonSerializerSettings
@@ -34,7 +35,7 @@ namespace Elasticsearch.LiteClient
         private readonly JsonSerializerSettings _jsonSettings;
         private readonly IHostProvider _hostProvider;
 
-        public ElasticClient(ClientOptions config)
+        public SimpleElasticClient(ClientOptions config)
         {
             _client = config.HttpClient ?? _defaultClient.Value;
             _log = config.Logger ?? NullLogger.Instance;
@@ -45,7 +46,7 @@ namespace Elasticsearch.LiteClient
         /// <summary>
         /// Executes a _search with the specified parameters.
         /// </summary>
-        /// <typeparam name="T">
+        /// <typeparam name="TSource">
         /// The index type model to use, this should support the mapping from the '_source'
         /// document object.
         /// </typeparam>
@@ -54,22 +55,23 @@ namespace Elasticsearch.LiteClient
         /// <param name="options">The options for the search query.</param>
         /// <param name="cancel">A cancellation token for the request.</param>
         /// <returns>The result of the requested search.</returns>
-        public async Task<SearchResult<T>> SearchAsync<T>(string index, object query, object options = null, CancellationToken cancel = default(CancellationToken))
+        public async Task<SearchResult<TSource>> SearchAsync<TSource>(string index, object query, object options = null, CancellationToken cancel = default(CancellationToken))
         {
-            if (options != null)
-            {
+            var requestUri = new Uri(_hostProvider.Next() + $"{index}/_search{QueryStringParser.GetQueryString(options)}");
+            var result = await MakeRequest<SearchResponse<TSource>>(HttpMethod.Post, requestUri, query, cancel);
 
-            }
+            return new SearchResult<TSource>(
+                hits: result.Hits.Hits.Select(h =>
+                {
+                    if (h.Source is IScoreDocument scoreDoc)
+                        scoreDoc.Score = h.Score;
 
-            var requestUri = new Uri(_hostProvider.Next() + $"{index}/_search");
-            var result = await MakeRequest<SearchResponse<T>>(HttpMethod.Post, requestUri, query, cancel);
-
-
-            return new SearchResult<T>
-            {
-                Hits = result.Hits.Hits,
-                Total = result.Hits.Total
-            };
+                    return h.Source;
+                }),
+                total: result.Hits.Total,
+                aggregations: result.Aggregations,
+                suggestions: null
+            );
         }
 
         private async Task<T> MakeRequest<T>(HttpMethod method, Uri requestUri, object query, CancellationToken cancel)
@@ -81,7 +83,7 @@ namespace Elasticsearch.LiteClient
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new ElasticsearchHttpException($"Request returned {response.StatusCode} status code");
+                    throw new SimpleElasticHttpException($"Request returned {response.StatusCode} status code");
                 }
 
                 using (var responseContent = await response.Content.ReadAsStreamAsync())

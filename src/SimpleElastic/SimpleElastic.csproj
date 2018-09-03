@@ -7,6 +7,8 @@
     <Copyright>2018 Paul Hatcherian</Copyright>
     <RepositoryUrl>https://github.com/PaulHatch/elasticsearch-lite</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Paul Hatcherian</Authors>
+    <Company />
   </PropertyGroup>
 
   <ItemGroup>

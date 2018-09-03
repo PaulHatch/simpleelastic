@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Elasticsearch.LiteClient
+namespace SimpleElastic
 {
     /// <summary>
     /// A thread-safe pool of host URIs, calls to <see cref="Next"/> return

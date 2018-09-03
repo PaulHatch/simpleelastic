@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Elasticsearch.LiteClient
+namespace SimpleElastic
 {
-    public class FlatConverter : JsonConverter
+    internal class FlatConverter : JsonConverter
     {
         private class ArrayInfo { public int Depth; public int Index; }
 
@@ -17,7 +17,7 @@ namespace Elasticsearch.LiteClient
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var result = new Dictionary<string, object>();
+            var result = new FlatObject();
             var path = new Stack<string>();
             var array = new Stack<ArrayInfo>();
             var startDepth = reader.Depth;

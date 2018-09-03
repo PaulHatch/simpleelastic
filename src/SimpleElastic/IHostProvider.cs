@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Elasticsearch.LiteClient
+namespace SimpleElastic
 {
     /// <summary>
     /// Defines a connection provider which supplies host endpoints

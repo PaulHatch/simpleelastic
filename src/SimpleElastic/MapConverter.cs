@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Elasticsearch.LiteClient
+namespace SimpleElastic
 {
     internal class MapConverter : JsonConverter
     {

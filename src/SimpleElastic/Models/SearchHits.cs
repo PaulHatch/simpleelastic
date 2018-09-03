@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Elasticsearch.LiteClient.Models
+namespace SimpleElastic.Models
 {
     internal class SearchHits<TSource>
     {

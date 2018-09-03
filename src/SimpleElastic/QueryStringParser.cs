@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Elasticsearch.LiteClient
+namespace SimpleElastic
 {
     internal static class QueryStringParser
     {

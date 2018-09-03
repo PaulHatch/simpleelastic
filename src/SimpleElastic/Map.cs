@@ -6,7 +6,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Elasticsearch.LiteClient
+namespace SimpleElastic
 {
     /// <summary>
     /// Dynamic object which maps properties and index values to a dictionary.

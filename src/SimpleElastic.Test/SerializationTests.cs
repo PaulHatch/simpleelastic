@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace Elasticsearch.LiteClient.Test
+namespace SimpleElastic.Test
 {
-    public class Serialization
+    public class SerializationTests
     {
         class TestDocument
         {
-            [JsonConverter(typeof(FlatConverter))]
-            public IDictionary<string,object> Test { get; set; }
+            public FlatObject Test { get; set; }
         }
 
 

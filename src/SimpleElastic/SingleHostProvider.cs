@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Elasticsearch.LiteClient
+namespace SimpleElastic
 {
     /// <summary>
     /// Conection provider which contains a single host.
