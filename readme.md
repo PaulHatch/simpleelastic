@@ -12,6 +12,10 @@ command language itself is not provided. Most API methods such as `_search` whic
 body simply accept an object which is serialized using Json.NET. There is no attempt made
 to use the type system to enforce correctly formed queries.
 
+## Current Status
+
+This project is a work in progress...
+
 # Types and Serialization
 
 In SimpleElastic generally follows the pattern that requests to elasticsearch is untyped and
@@ -19,7 +23,11 @@ open, while responses are serialized to specific response types. The main search
 example uses the following signature:
 
 ```csharp
-Task<SearchResult<TSource>> SearchAsync<TSource>(string index, object query, object options, CancellationToken cancel)
+Task<SearchResult<TSource>> SearchAsync<TSource>(
+    string index,
+	object query,
+	object options,
+	CancellationToken cancel)
 ```
 
 The query is defined as `System.Object`, there's no abstract "Query" class with "TermQuery",
