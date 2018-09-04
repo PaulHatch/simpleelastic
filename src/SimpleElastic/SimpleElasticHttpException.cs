@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace SimpleElastic
 {
     /// <summary>
-    /// Represents an HTTP exception (inheirits from <see cref="System.Net.Http.HttpRequestException"/>)
+    /// Represents an HTTP exception (inherits from <see cref="System.Net.Http.HttpRequestException"/>)
     /// during a request to elasticsearch.
     /// </summary>
     /// <seealso cref="System.Net.Http.HttpRequestException" />

@@ -5,7 +5,7 @@ using System.Text;
 namespace SimpleElastic
 {
     /// <summary>
-    /// Conection provider which contains a single host.
+    /// Connection provider which contains a single host.
     /// </summary>
     public sealed class SingleHostProvider : IHostProvider
     {

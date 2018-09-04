@@ -35,6 +35,18 @@ namespace SimpleElastic
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Map"/> class.
+        /// </summary>
+        /// <param name="initialValues">The initial values for the map.</param>
+        public Map(IDictionary<string,object> initialValues)
+        {
+            foreach (var value in initialValues)
+            {
+                _values.Add(value.Key, value.Value);
+            }
+        }
+
+        /// <summary>
         /// Gets the internal values of this map.
         /// </summary>
         internal IDictionary<string, object> Values => _values;

@@ -9,7 +9,7 @@ namespace SimpleElastic
     /// Bucket value of an aggregation result.
     /// </summary>
     [JsonConverter(typeof(AggregationBucketConverter))]
-    public class AggregationBucket : AggregationBase
+    public sealed class AggregationBucket : AggregationBase
     {
         private IEnumerable<FlatObject> _hits;
 

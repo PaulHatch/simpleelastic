@@ -14,7 +14,7 @@ to use the type system to enforce correctly formed queries.
 
 ## Current Status
 
-This project is a work in progress...
+This project is a work in progress in pre-alpha status, not ready for use yet.
 
 # Types and Serialization
 
@@ -25,9 +25,9 @@ example uses the following signature:
 ```csharp
 Task<SearchResult<TSource>> SearchAsync<TSource>(
     string index,
-	object query,
-	object options,
-	CancellationToken cancel)
+    object query,
+    object options,
+    CancellationToken cancel)
 ```
 
 The query is defined as `System.Object`, there's no abstract "Query" class with "TermQuery",

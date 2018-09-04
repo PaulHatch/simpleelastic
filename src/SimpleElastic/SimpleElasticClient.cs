@@ -19,7 +19,7 @@ namespace SimpleElastic
     /// </summary>
     public sealed class SimpleElasticClient
     {
-        private const string _mediaType = "application/json";
+        private const string _applicationJson = "application/json";
         private static readonly JsonSerializerSettings _defaultJsonSettings = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -41,6 +41,26 @@ namespace SimpleElastic
             _log = config.Logger ?? NullLogger.Instance;
             _jsonSettings = config.SerializerSettings ?? _defaultJsonSettings;
             _hostProvider = config.HostProvider ?? throw new ArgumentNullException($"{nameof(ClientOptions.HostProvider)} cannot be null", nameof(config));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleElasticClient"/> class with
+        /// a single specified host and default options.
+        /// </summary>
+        /// <param name="host">The elasticsearch host to connect to.</param>
+        public SimpleElasticClient(Uri host)
+            : this(new ClientOptions(host))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleElasticClient"/> class with
+        /// a single specified host and default options
+        /// </summary>
+        /// <param name="host">The elasticsearch host to connect to.</param>
+        public SimpleElasticClient(string host)
+            : this(new ClientOptions(new Uri(host)))
+        {
         }
 
         /// <summary>
@@ -77,7 +97,7 @@ namespace SimpleElastic
         private async Task<T> MakeRequest<T>(HttpMethod method, Uri requestUri, object query, CancellationToken cancel)
         {
             var requestBody = JsonConvert.SerializeObject(query, _jsonSettings);
-            using (var content = new StringContent(requestBody, Encoding.UTF8, _mediaType))
+            using (var content = new StringContent(requestBody, Encoding.UTF8, _applicationJson))
             using (var request = new HttpRequestMessage(method, requestUri) { Content = content })
             using (var response = await _client.SendAsync(request, cancel))
             {

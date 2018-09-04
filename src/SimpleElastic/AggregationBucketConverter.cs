@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using SimpleElastic.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,9 +6,9 @@ using System.Text;
 namespace SimpleElastic
 {
     /// <summary>
-    /// Internal deserializer to map results to our aggregation result type.
+    /// Internal deserializer to map results to our aggregation bucket result type.
     /// </summary>
-    internal class AggregationConverter : JsonConverter
+    internal class AggregationBucketConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -18,7 +17,7 @@ namespace SimpleElastic
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var result = new Aggregation();
+            var result = new AggregationBucket();
             while (reader.Read())
             {
                 switch (reader.TokenType)
@@ -28,21 +27,16 @@ namespace SimpleElastic
                         reader.Read();
                         switch (name)
                         {
-                            case "doc_count_error_upper_bound": 
-                                result.DocumentCountErrorUpperBound = serializer.Deserialize<long>(reader);
+                            case "key":
+                                result.Key = serializer.Deserialize<string>(reader);
                                 break;
-                            case "sum_other_doc_count":
-                                result.SumOtherDocumentCount = serializer.Deserialize<long>(reader);
+                            case "doc_count":
+                                result.Count = serializer.Deserialize<long>(reader);
                                 break;
-                            case "buckets":
-                                if (reader.TokenType == JsonToken.StartArray)
+                            case "hits":
+                                if (reader.TokenType == JsonToken.StartObject)
                                 {
-                                    var aggs = new List<AggregationBucket>();
-                                    while (reader.Read() && reader.TokenType != JsonToken.EndArray)
-                                    {
-                                        aggs.Add(serializer.Deserialize<AggregationBucket>(reader));
-                                    }
-                                    result.Buckets = aggs;
+                                    result.Hits = serializer.Deserialize<IEnumerable<FlatObject>>(reader);
                                 }
                                 break;
                             default:

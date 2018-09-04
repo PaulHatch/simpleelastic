@@ -7,6 +7,9 @@ using System.Reflection;
 
 namespace SimpleElastic
 {
+    /// <summary>
+    /// Internal utility for converting objects to query strings.
+    /// </summary>
     internal static class QueryStringParser
     {
         private static MemoryCache _methodCache = new MemoryCache(new MemoryCacheOptions());
