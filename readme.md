@@ -42,6 +42,8 @@ objects in my opinion. Any attempt to provide a fluent interface is impeded by t
 to create nested object definitions, creating delegates within delegates. While there is
 some convenience in being able to utilize the typeahead system when composing queries,
 "translating" JSON queries written for example in Kibana is not particularly intuitive.
+The problem is that much worse for the fact the elasticsearch queries contain many small
+objects for which an obvious name does not exist.
 
 A non-fluent approach which still provides the language as a type model loses the benefits
 of typeahead discoverability, and adds a lot of extra noise to queries. An elasticsearch
@@ -50,9 +52,11 @@ many different potential properties. Combine this with .NET naming guidelines fa
 more verbose, non-abbreviated type names and you get a lot of clutter in your code. And yet
 for all the drawbacks typing can only save you from a certain narrow class of errors.
 
-I believe an ideal solution would be a [Visual Studio Code Analysis Rule], similar to the
+A better solution might be a [Visual Studio Code Analysis Rule], similar to the
 validation that Kibana's query tool provides, but this is an effort outside the scope of
 this project for now.
+
+[Visual Studio Code Analysis Rule]: https://docs.microsoft.com/en-us/visualstudio/code-quality/code-analysis-for-managed-code-overview?view=vs-2017
 
 ## The Map Class
 
