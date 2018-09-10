@@ -1,13 +1,14 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace SimpleElastic.Test
 {
     public class SerializationTests
     {
-        class TestDocument
+        private class TestDocument
         {
             public FlatObject Test { get; set; }
         }
@@ -96,5 +97,61 @@ namespace SimpleElastic.Test
 
             Assert.Equal(expectedJson, json);
         }
+
+        [Fact]
+        public void EmptyBulkActionSerializesCorrectly()
+        {
+            var source = new BulkActionRequest(BulkActionType.Index) { Document = new { field = "value" } };
+            var result = JsonConvert.SerializeObject(source);
+
+            Assert.Equal("{\"index\":{}}\n{\"field\":\"value\"}\n", result);
+        }
+
+        [Fact]
+        public void FullBulkActionSerializesCorrectly()
+        {
+            var source = new BulkActionRequest(BulkActionType.Index)
+            {
+                ID = "1",
+                Index = "sample",
+                Type = "_doc",
+                Document = new { field = "value" }
+
+            };
+            var result = JsonConvert.SerializeObject(source);
+
+            Assert.Equal("{\"index\":{\"_id\":\"1\",\"_index\":\"sample\",\"_type\":\"_doc\"}}\n{\"field\":\"value\"}\n", result);
+        }
+
+        [Fact]
+        public void BulkCreateSerializesCorrectly()
+        {
+            var source = new BulkActionRequest(BulkActionType.Create) { Document = new { field = "value" } };
+            var result = JsonConvert.SerializeObject(source);
+
+            Assert.Equal("{\"create\":{}}\n{\"field\":\"value\"}\n", result);
+        }
+
+        [Fact]
+        public void BulkUpdateSerializesCorrectly()
+        {
+            var source = new BulkActionRequest(BulkActionType.Update) { Document = new { doc = new { field = "value" } } };
+            var result = JsonConvert.SerializeObject(source);
+
+            Assert.Equal("{\"update\":{}}\n{\"doc\":{\"field\":\"value\"}}\n", result);
+        }
+
+        [Fact]
+        public void BulkResponseDeserializedCorrectly()
+        {
+            var response = @"{""took"":5,""errors"":true,""items"":[{""index"":{""_index"":""sample"",""_type"":""sample"",""_id"":""1"",""_version"":9,""result"":""updated"",""_shards"":{""total"":2,""successful"":1,""failed"":0},""created"":false,""status"":200}},{""create"":{""_index"":""sample"",""_type"":""sample"",""_id"":""3"",""status"":409,""error"":{""type"":""version_conflict_engine_exception"",""reason"":""[sample][3]:version conflict, document already exists (current version [3])"",""index_uuid"":""vfwRxBKnRrakP99Gvb1BNQ"",""shard"":""4"",""index"":""sample""}}},{""create"":{""_index"":""sample"",""_type"":""sample"",""_id"":""4"",""status"":409,""error"":{""type"":""version_conflict_engine_exception"",""reason"":""[sample][4]:version conflict, document already exists (current version [1])"",""index_uuid"":""vfwRxBKnRrakP99Gvb1BNQ"",""shard"":""2"",""index"":""sample""}}},{""delete"":{""found"":false,""_index"":""sample"",""_type"":""sample"",""_id"":""5"",""_version"":3,""result"":""not_found"",""_shards"":{""total"":2,""successful"":1,""failed"":0},""status"":404}}]}";
+
+            var result = JsonConvert.DeserializeObject<BulkActionResult>(response);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(5, result.Took.TotalMilliseconds);
+            Assert.Equal(4, result.Items.Count());
+        }
+
     }
 }
