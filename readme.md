@@ -154,6 +154,31 @@ Will be serialized as a `FlatObject` with the following keys:
 [inner hits]: https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-inner-hits.html
 [top hits]: https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-top-hits-aggregation.html
 
+## Name Helper
+
+The `NameHelper` provides the `ToName<TDocument>` extension method to obtain the property
+name that will be used when the object is serialized for elasticsearch. For example, 
+given the class:
+
+```csharp
+public class MyIndex
+{
+	[JsonProperty("nm")]
+	public string Name { get; set; }
+}
+```
+
+The following code can be used to obtain the property name:
+
+```csharp
+string propertyName = nameof(MyIndex.Name).ToName<MyIndex>();
+
+Assert.Equal("nm", propertyName); // success
+```
+
+The `ToName<TDocument>` method supports `JsonPropertyAttribute` and `JsonObjectAttribute`
+custom naming strategy, or will fall back to the global default if none was specified.
+
 # Version Support
 
 Since the queries are user generated, it is up to consumers to create queries which are

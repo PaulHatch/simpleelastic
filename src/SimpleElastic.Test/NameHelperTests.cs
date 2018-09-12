@@ -9,7 +9,8 @@ namespace SimpleElastic.Test
 {
     public class NameHelperTests
     {
-        public class TestClass
+        [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
+        public class Test
         {
             public int NoAttribute { get; set; }
 
@@ -24,56 +25,68 @@ namespace SimpleElastic.Test
 
             [JsonProperty(
                 PropertyName = "NamedCamel",
-                NamingStrategyType = typeof(CamelCaseNamingStrategy), 
-                NamingStrategyParameters =new object[] { true,true })]
+                NamingStrategyType = typeof(CamelCaseNamingStrategy),
+                NamingStrategyParameters = new object[] { true, true })]
             public int NamedCamelCaseWithParams { get; set; }
 
             [JsonProperty(
                 PropertyName = "NamedCamel",
                 NamingStrategyType = typeof(CamelCaseNamingStrategy))]
             public int NamedCamelCase { get; set; }
+        }
 
+        public class TestWithoutAttribute
+        {
+            public int NoAttribute { get; set; }
         }
 
         [Fact]
         public void NoAttributeCorrect()
         {
-            var name = nameof(TestClass.NoAttribute).ToName<TestClass>();
+            var name = nameof(Test.NoAttribute).ToName<Test>();
+            Assert.Equal("no_attribute", name);
+        }
+
+        [Fact]
+        public void NoAttributeWithDefaultStrategyCorrect()
+        {
+            var name = nameof(TestWithoutAttribute.NoAttribute).ToName<TestWithoutAttribute>();
             Assert.Equal("noAttribute", name);
         }
+
 
         [Fact]
         public void ExplicitNameCorrect()
         {
-            var name = nameof(TestClass.ExplicitName).ToName<TestClass>();
+            var name = nameof(Test.ExplicitName).ToName<Test>();
             Assert.Equal("explicit", name);
         }
 
         [Fact]
         public void CamelCaseCorrect()
         {
-            var name = nameof(TestClass.CamelCase).ToName<TestClass>();
+            var name = nameof(Test.CamelCase).ToName<Test>();
             Assert.Equal("camelCase", name);
         }
 
         [Fact]
         public void SnakeCaseCorrect()
         {
-            var name = nameof(TestClass.SnakeCase).ToName<TestClass>();
+            var name = nameof(Test.SnakeCase).ToName<Test>();
             Assert.Equal("snake_case", name);
         }
 
         [Fact]
         public void NamedCamelCaseCorrect()
         {
-            var name = nameof(TestClass.NamedCamelCase).ToName<TestClass>();
+            var name = nameof(Test.NamedCamelCase).ToName<Test>();
             Assert.Equal("NamedCamel", name);
         }
 
         [Fact]
         public void NamedCamelCaseWithParamsCorrect()
         {
-            var name = nameof(TestClass.NamedCamelCaseWithParams).ToName<TestClass>();
+            var name = nameof(Test.NamedCamelCaseWithParams).ToName<Test>();
             Assert.Equal("namedCamel", name);
         }
 

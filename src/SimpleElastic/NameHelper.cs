@@ -11,9 +11,22 @@ namespace SimpleElastic
         internal static readonly Dictionary<string, string> Values
             = new Dictionary<string, string>();
 
+        
         static NameHelper()
         {
-            var naming = (SimpleElasticClient.DefaultJsonSettings.ContractResolver as DefaultContractResolver)?.NamingStrategy;
+            var objectAttribute = typeof(T).GetCustomAttribute<JsonObjectAttribute>();
+
+            NamingStrategy naming;
+            if (objectAttribute?.NamingStrategyType != null)
+            {
+                naming = (NamingStrategy)Activator.CreateInstance(
+                    objectAttribute.NamingStrategyType,
+                    objectAttribute.NamingStrategyParameters);
+            }
+            else
+            {
+                naming = (SimpleElasticClient.DefaultJsonSettings.ContractResolver as DefaultContractResolver)?.NamingStrategy;
+            }
 
             var properties = typeof(T).GetProperties();
             foreach (var property in properties)
@@ -25,7 +38,10 @@ namespace SimpleElastic
 
                 if (attribute?.NamingStrategyType != null)
                 {
-                    var propNaming = (NamingStrategy)Activator.CreateInstance(attribute.NamingStrategyType, attribute.NamingStrategyParameters);
+                    var propNaming = (NamingStrategy)Activator.CreateInstance(
+                        attribute.NamingStrategyType, 
+                        attribute.NamingStrategyParameters);
+
                     name = propNaming.GetPropertyName(name, specificName);
                 }
                 else
