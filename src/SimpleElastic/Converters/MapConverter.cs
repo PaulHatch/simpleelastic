@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SimpleElastic
+namespace SimpleElastic.Converters
 {
     /// <summary>
     /// Converter for Map type, serializes the wrapped values of the map.
@@ -12,7 +12,7 @@ namespace SimpleElastic
     {
         public override bool CanConvert(Type objectType)
         {
-            return true;
+            throw new NotImplementedException();
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

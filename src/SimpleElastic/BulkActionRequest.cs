@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SimpleElastic.Converters;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +10,7 @@ namespace SimpleElastic
     /// Represents a request for a document action within a bulk action request.
     /// </summary>
     [JsonConverter(typeof(BulkActionRequestConverter))]
-    public class BulkActionRequest
+    public sealed class BulkActionRequest
     {
         /// <summary>
         /// Represents a request for a document action within a bulk action request.

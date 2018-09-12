@@ -19,10 +19,11 @@ namespace SimpleElastic
     /// </summary>
     public sealed class SimpleElasticClient
     {
-        private static readonly JsonSerializerSettings _defaultJsonSettings = new JsonSerializerSettings
+        public static JsonSerializerSettings DefaultJsonSettings { get; set; } = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
+
         private static readonly Lazy<HttpClient> _defaultClient = new Lazy<HttpClient>(CreateClient);
         private static HttpClient CreateClient()
         {
@@ -38,7 +39,7 @@ namespace SimpleElastic
         {
             _client = config.HttpClient ?? _defaultClient.Value;
             _log = config.Logger ?? NullLogger.Instance;
-            _jsonSettings = config.SerializerSettings ?? _defaultJsonSettings;
+            _jsonSettings = DefaultJsonSettings;
             _hostProvider = config.HostProvider ?? throw new ArgumentNullException($"{nameof(ClientOptions.HostProvider)} cannot be null", nameof(config));
         }
 

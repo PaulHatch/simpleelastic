@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace SimpleElastic
+namespace SimpleElastic.Converters
 {
-
     internal class BulkActionResultItemConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)

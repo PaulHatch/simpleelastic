@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SimpleElastic.Converters;
 using System;
 using System.Collections.Generic;
 using System.Text;

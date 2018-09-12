@@ -4,37 +4,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SimpleElastic
+namespace SimpleElastic.Converters
 {
     internal class FlatConverter : JsonConverter
     {
-        private class ArrayInfo { public int Depth; public int Index; }
-
         public override bool CanConvert(Type objectType)
         {
-            return true;
+            throw new NotImplementedException();
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var result = new FlatObject();
-            var path = new Stack<string>();
-            var array = new Stack<ArrayInfo>();
             var startDepth = reader.Depth;
+            var pathLength = reader.Path.Length + 1;
             while (reader.Read())
             {
                 switch (reader.TokenType)
                 {
-                    case JsonToken.StartArray:
-                        path.Push("0");
-                        array.Push(new ArrayInfo { Depth = reader.Depth });
-                        break;
-                    case JsonToken.EndArray:
-                        array.Pop();
-                        break;
-                    case JsonToken.PropertyName:
-                        path.Push(reader.Value.ToString());
-                        break;
                     case JsonToken.Integer:
                     case JsonToken.Float:
                     case JsonToken.String:
@@ -42,28 +29,13 @@ namespace SimpleElastic
                     case JsonToken.Null:
                     case JsonToken.Date:
                     case JsonToken.Bytes:
-                        result.Add(String.Join(".", path.Reverse()), reader.Value);
-                        path.Pop();
-                        if (array.Any() && array.Peek().Depth == reader.Depth - 1)
-                        {
-                            var arrayInfo = array.Peek();
-                            arrayInfo.Index++;
-                            path.Push(arrayInfo.Index.ToString());
-                        }
+                        result.Add(reader.Path.Substring(pathLength), reader.Value);
                         break;
                     case JsonToken.EndObject:
                         if (reader.Depth == startDepth)
                         {
                             return result;
                         }
-                        path.Pop();
-                        if (array.Any() && array.Peek().Depth == reader.Depth - 1)
-                        {
-                            var arrayInfo = array.Peek();
-                            arrayInfo.Index++;
-                            path.Push(arrayInfo.Index.ToString());
-                        }
-
                         break;
                     default:
                         break;

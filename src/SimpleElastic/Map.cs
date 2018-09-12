@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SimpleElastic.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,8 +17,8 @@ namespace SimpleElastic
     [JsonConverter(typeof(MapConverter))]
     public class Map : DynamicObject, IEnumerable
     {
-
-        private Dictionary<string, object> _values = new Dictionary<string, object>();
+        private Dictionary<string, object> _values
+            = new Dictionary<string, object>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Map"/> class.

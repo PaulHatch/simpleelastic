@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,11 +73,11 @@ namespace SimpleElastic
         public HttpMessageInvoker HttpClient { get; set; }
 
         /// <summary>
-        /// Gets or sets the serializer settings to use when handling requests,
+        /// Gets or sets the JSON Name to use when handling requests,
         /// if none is provided, the default settings will be used which include
         /// camel case names contract resolved (i.e. FieldName -> fieldName).
         /// </summary>
-        public JsonSerializerSettings SerializerSettings { get; set; }
+        public static NamingStrategy NamingStrategy { get; set; }
 
         /// <summary>
         /// Gets or sets the logger to use.

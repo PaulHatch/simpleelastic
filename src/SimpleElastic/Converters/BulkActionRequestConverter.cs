@@ -1,13 +1,13 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace SimpleElastic
+namespace SimpleElastic.Converters
 {
     internal class BulkActionRequestConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return false;
+            throw new NotImplementedException();
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

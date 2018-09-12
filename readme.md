@@ -146,8 +146,8 @@ Will be serialized as a `FlatObject` with the following keys:
 	"id": 123,
 	"name": "Example",
 	"properties.title": "abc",
-	"values.0": "one",
-	"values.1": "two"
+	"properties.values[0]": "one",
+	"properties.values[1]": "two"
 }
 ```
 

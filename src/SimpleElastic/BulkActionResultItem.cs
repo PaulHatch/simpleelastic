@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SimpleElastic.Converters;
 
 namespace SimpleElastic
 {
