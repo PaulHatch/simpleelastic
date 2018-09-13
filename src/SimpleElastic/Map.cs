@@ -52,6 +52,14 @@ namespace SimpleElastic
         /// </summary>
         internal IDictionary<string, object> Values => _values;
 
+        internal void Add(string key, object value, bool condition)
+        {
+            if (condition)
+            {
+                Add(key, value);
+            }
+        }
+
         /// <summary>
         /// Adds the specified key/value pair.
         /// </summary>
