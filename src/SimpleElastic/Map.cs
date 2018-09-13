@@ -52,9 +52,36 @@ namespace SimpleElastic
         /// </summary>
         internal IDictionary<string, object> Values => _values;
 
-        internal void Add(string key, object value, bool condition)
+        /// <summary>
+        /// Adds the specified key/value pair if the condition
+        /// specified is true.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="condition">
+        /// A boolean indicating whether or not this value should be added.
+        /// </param>
+        public void Add(string key, object value, bool condition)
         {
             if (condition)
+            {
+                Add(key, value);
+            }
+        }
+
+        /// <summary>
+        /// Adds the specified key/value pair if the condition
+        /// specified is true.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="condition">
+        /// A predicate delegate which will be evaluated using the value provided. If true, this
+        /// value will be added, otherwise it will be ignored.
+        /// </param>
+        public void Add(string key, object value, Predicate<object> condition)
+        {
+            if (condition(value))
             {
                 Add(key, value);
             }

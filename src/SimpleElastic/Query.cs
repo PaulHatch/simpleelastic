@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SimpleElastic
@@ -147,7 +149,7 @@ namespace SimpleElastic
                 prefix = new Map(field, new Map
                 {
                     { "value", value },
-                    { "boost", boost.Value, boost.HasValue },
+                    { "boost", boost, boost.HasValue },
                     { "rewrite", rewrite, rewrite != null }
                 })
             };
@@ -173,7 +175,7 @@ namespace SimpleElastic
                 wildcard = new Map(field, new Map
                 {
                     { "value", value },
-                    { "boost", boost.Value, boost.HasValue },
+                    { "boost", boost, boost.HasValue },
                     { "rewrite", rewrite, rewrite != null }
                 })
             };
@@ -199,7 +201,7 @@ namespace SimpleElastic
                 regex = new Map(field, new Map
                 {
                     { "value", value },
-                    { "boost", boost.Value, boost.HasValue },
+                    { "boost", boost, boost.HasValue },
                     { "flags", flags, flags != null }
                 })
             };
@@ -222,9 +224,9 @@ namespace SimpleElastic
         /// An object representing a fuzzy query.
         /// </returns>
         public object Fuzzy(
-            string field, 
-            string value, 
-            float? boost = null, 
+            string field,
+            string value,
+            float? boost = null,
             object fuzziness = null,
             int? prefixLength = null,
             int? maxExpansions = null,
@@ -235,7 +237,7 @@ namespace SimpleElastic
                 fuzzy = new Map(field, new Map
                 {
                     { "value", value },
-                    { "boost", boost.Value, boost.HasValue },
+                    { "boost", boost, boost.HasValue },
                     { "fuzziness", fuzziness, fuzziness != null },
                     { "prefix_length", prefixLength, prefixLength.HasValue },
                     { "max_expansions", prefixLength, maxExpansions.HasValue },
@@ -252,6 +254,137 @@ namespace SimpleElastic
         public object Ids(IEnumerable<object> ids)
         {
             return new { ids = new { values = ids } };
+        }
+
+        /// <summary>
+        /// Creates an constant score query that wraps another query and simply returns a
+        /// constant score equal to the query boost for every document in the filter.
+        /// </summary>
+        /// <param name="filter">The filter, filter clauses are executed in filter context,
+        /// meaning that scoring is ignored and clauses are considered for caching..</param>
+        /// <param name="boost">The boost value to assign to matching documents.</param>
+        /// <returns>
+        /// An object representing a constant score query.
+        /// </returns>
+        public object ConstantScore(object filter, float boost)
+        {
+            return new { constant_score = new { filter = filter, boost = boost } };
+        }
+
+        /// <summary>
+        /// Creates a bool query which matches documents matching boolean combinations of other queries.
+        /// </summary>
+        /// <param name="must">The clause (query) must appear in matching documents and will contribute to the score.</param>
+        /// <param name="mustNot">The clause (query) must not appear in the matching documents. Clauses are executed in filter
+        /// context meaning that scoring is ignored and clauses are considered for caching. Because scoring is ignored, a score
+        /// of 0 for all documents is returned.</param>
+        /// <param name="should">The clause (query) should appear in the matching document. If the bool query is in a query
+        /// context and has a must or filter clause then a document will match the bool query even if none of the should queries
+        /// match. In this case these clauses are only used to influence the score. If the bool query is a filter context or has
+        /// neither must or filter then at least one of the should queries must match a document for it to match the bool query.
+        /// This behavior may be explicitly controlled by settings the minimumShouldMatch parameter.</param>
+        /// <param name="filter">The clause (query) must appear in matching documents. However unlike must the score of the query
+        /// will be ignored. Filter clauses are executed in filter context, meaning that scoring is ignored and clauses are 
+        /// considered for caching.</param>
+        /// <param name="minimumShouldMatch">Controls how queries matches are counted.</param>
+        /// <param name="boost">The boost value for this query.</param>
+        /// <returns>
+        /// An object representing a bool query.
+        /// </returns>
+        public object Bool(
+            IEnumerable<object> must = null,
+            IEnumerable<object> mustNot = null,
+            IEnumerable<object> should = null,
+            IEnumerable<object> filter = null,
+            object minimumShouldMatch = null,
+            float? boost = null)
+        {
+            return new
+            {
+                @bool = new Map
+                {
+                    { "must", must, must?.Any() == true },
+                    { "must_not", mustNot, mustNot?.Any() == true },
+                    { "should", should, should?.Any() == true },
+                    { "filter", filter, filter?.Any() == true },
+                    { "minimum_should_match", minimumShouldMatch, minimumShouldMatch != null },
+                    { "boost", boost, boost.HasValue }
+                }
+            };
+        }
+
+        private static int Count<T>(IEnumerable<T> enumerable)
+        {
+            using (var enumerator = enumerable.GetEnumerator())
+            {
+                if (!enumerator.MoveNext())
+                {
+                    return 0;
+                }
+                if (!enumerator.MoveNext())
+                {
+                    return 1;
+                }
+                return 2;
+            }
+        }
+
+        /// <summary>
+        /// Creates a logical OR query using a bool 'should' query, if no queries are provided, a match all will be returned,
+        /// if only one query is provided the bool query will be skipped and just that query will be returned.
+        /// </summary>
+        /// <param name="queries">The queries to combine.</param>
+        /// <returns>A query representing the specified operation.</returns>
+        public static object Or(params object[] queries)
+        {
+            return Or((IEnumerable<object>)queries);
+        }
+
+
+        /// <summary>
+        /// Creates a logical OR query using a bool 'should' query, if no queries are provided, a match all will be returned,
+        /// if only one query is provided the bool query will be skipped and just that query will be returned.
+        /// </summary>
+        /// <param name="queries">The queries.</param>
+        /// <returns></returns>
+        public static object Or(IEnumerable<object> queries)
+        {
+            switch (Count(queries))
+            {
+                case 0: return new { match_all = new { } };
+                case 1: return queries.ElementAt(0);
+                default: return new { @bool = new { should = queries, minimum_should_match = 1 } };
+            }
+        }
+
+        /// <summary>
+        /// Creates a logical And query using a bool 'should' query, if no queries are provided, a "not match all"
+        /// will be returned to ensure that the query matches no documents are returned, if only one query is 
+        /// provided the bool query will be skipped and just that query will be returned.
+        /// </summary>
+        /// <param name="queries">The queries.</param>
+        /// <returns></returns>
+        public static object And(params object[] queries)
+        {
+            return Or((IEnumerable<object>)queries);
+        }
+
+
+        /// <summary>
+        /// Creates a logical And query using a bool 'should' query, if no queries are provided, a "not match all"
+        /// will be returned to ensure that the query matches no documents are returned, if only one query is 
+        /// provided the bool query will be skipped and just that query will be returned.
+        /// </summary>
+        /// <param name="queries">The queries.</param>
+        /// <returns></returns>
+        public static object And(IEnumerable<object> queries)
+        {
+            switch (Count(queries))
+            {
+                case 0: return new { @bool = new { must_not = new { match_all = new { } } } };
+                case 1: return queries.ElementAt(0);
+                default: return new { @bool = new { must = queries } };
+            }
         }
     }
 }
