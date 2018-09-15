@@ -90,5 +90,20 @@ namespace SimpleElastic.Test
             Assert.Equal("namedCamel", name);
         }
 
+
+        [Fact]
+        public void PropertiesSerializeCorrectly()
+        {
+            var properties = new Properties<Test>
+            {
+                { nameof(Test.SnakeCase), "123" }
+            };
+
+            var json = JsonConvert.SerializeObject(properties);
+
+            Assert.Equal("{\"snake_case\":\"123\"}", json);
+            
+        }
+
     }
 }

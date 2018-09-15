@@ -330,8 +330,9 @@ namespace SimpleElastic
         }
 
         /// <summary>
-        /// Creates a logical OR query using a bool 'should' query, if no queries are provided, a match all will be returned,
-        /// if only one query is provided the bool query will be skipped and just that query will be returned.
+        /// Creates a logical OR query using a bool 'should' query, if no queries are provided, a  "match none"
+        /// will be returned to ensure that the query matches no documents are returned, if only one query is 
+        /// provided the bool query will be skipped and just that query will be returned.
         /// </summary>
         /// <param name="queries">The queries to combine.</param>
         /// <returns>A query representing the specified operation.</returns>
@@ -342,28 +343,29 @@ namespace SimpleElastic
 
 
         /// <summary>
-        /// Creates a logical OR query using a bool 'should' query, if no queries are provided, a match all will be returned,
-        /// if only one query is provided the bool query will be skipped and just that query will be returned.
+        /// Creates a logical OR query using a bool 'should' query, if no queries are provided, a  "match none"
+        /// will be returned to ensure that the query matches no documents are returned, if only one query is 
+        /// provided the bool query will be skipped and just that query will be returned.
         /// </summary>
-        /// <param name="queries">The queries.</param>
-        /// <returns></returns>
+        /// <param name="queries">The queries to combine.</param>
+        /// <returns>A query representing the specified operation.</returns>
         public static object Or(IEnumerable<object> queries)
         {
             switch (Count(queries))
             {
-                case 0: return new { match_all = new { } };
+                case 0: return new { match_none = new { } };
                 case 1: return queries.ElementAt(0);
                 default: return new { @bool = new { should = queries, minimum_should_match = 1 } };
             }
         }
 
         /// <summary>
-        /// Creates a logical And query using a bool 'should' query, if no queries are provided, a "not match all"
+        /// Creates a logical And query using a bool 'should' query, if no queries are provided, a  "match none"
         /// will be returned to ensure that the query matches no documents are returned, if only one query is 
         /// provided the bool query will be skipped and just that query will be returned.
         /// </summary>
-        /// <param name="queries">The queries.</param>
-        /// <returns></returns>
+        /// <param name="queries">The queries to combine.</param>
+        /// <returns>A query representing the specified operation.</returns>
         public static object And(params object[] queries)
         {
             return Or((IEnumerable<object>)queries);
@@ -371,20 +373,106 @@ namespace SimpleElastic
 
 
         /// <summary>
-        /// Creates a logical And query using a bool 'should' query, if no queries are provided, a "not match all"
+        /// Creates a logical And query using a bool 'should' query, if no queries are provided, a "match none"
         /// will be returned to ensure that the query matches no documents are returned, if only one query is 
         /// provided the bool query will be skipped and just that query will be returned.
         /// </summary>
-        /// <param name="queries">The queries.</param>
-        /// <returns></returns>
+        /// <param name="queries">The queries to combine.</param>
+        /// <returns>A query representing the specified operation.</returns>
         public static object And(IEnumerable<object> queries)
         {
             switch (Count(queries))
             {
-                case 0: return new { @bool = new { must_not = new { match_all = new { } } } };
+                case 0: return new { match_none = new { } };
                 case 1: return queries.ElementAt(0);
                 default: return new { @bool = new { must = queries } };
             }
+        }
+
+        /// <summary>
+        /// Creates a disjunction-max query which generates the union of documents produced by its subqueries, and 
+        /// that scores each document with the maximum score for that document as produced by any subquery, plus
+        /// a tie breaking increment for any additional matching subqueries.
+        /// </summary>
+        /// <param name="queries">The queries to combine, must not be null.</param>
+        /// <param name="boost">An optional boost level for this query.</param>
+        /// <param name="tieBreaker">An optional tie-breaker which allows results that include the same term in 
+        /// multiple fields to be judged better than results that include this term in only the best of those 
+        /// multiple fields, without confusing this with the better case of two different terms in the multiple 
+        /// fields.The default tie_breaker is 0.0.</param>
+        /// <returns>An object representing a disjunction-max query.</returns>
+        public object DisMax(IEnumerable<object> queries, float? boost = null, float? tieBreaker = null)
+        {
+            return new
+            {
+                dis_map = new Map
+                {
+                    { "queries", queries ?? throw new NullReferenceException(nameof(queries)) },
+                    { "boost", boost, boost.HasValue },
+                    { "tie_breaker", tieBreaker, tieBreaker.HasValue }
+                }
+            };
+        }
+
+        /// <summary>
+        /// Creates a function score query which allows you to modify the score of documents that are retrieved by
+        /// a query. This can be useful if, for example, a score function is computationally expensive and it is 
+        /// sufficient to compute the score on a filtered set of documents.
+        /// </summary>
+        /// <param name="functions">The functions to execute.</param>
+        /// <param name="query">The query to operate on.</param>
+        /// <param name="scoreMode">The score mode, by default this is 'multiply', other options are
+        /// 'sum', 'avg', 'first', 'max', or 'min'.</param>
+        /// <param name="boostMode">The boost mode, by default this is 'multiply', other options are
+        /// 'replace', 'sum', 'avg', 'max', or 'min'.</param>
+        /// <param name="boost">An optional boost to apply to this query.</param>
+        /// <param name="minScore">The minimum score for this query.</param>
+        /// <param name="maxBoost">The maximum boost for this query.</param>
+        /// <returns></returns>
+        public object FunctionScore(
+            IEnumerable<object> functions,
+            object query,
+            string scoreMode = null,
+            string boostMode = null,
+            float? boost = null,
+            float? minScore = null,
+            float? maxBoost = null)
+        {
+            return new
+            {
+                function_score = new Map
+                {
+                    { "query", query, query != null },
+                    { "boost", boost, boost.HasValue},
+                    { "functions", functions },
+                    { "max_boost", maxBoost, maxBoost.HasValue },
+                    { "score_mode", scoreMode, scoreMode != null },
+                    { "boost_mode", boostMode, boostMode != null },
+                    { "min_score" , minScore, minScore.HasValue }
+                }
+            };
+        }
+
+        /// <summary>
+        /// Creates a boosting query which can be used to effectively demote results that match a given query. 
+        /// Unlike the "NOT" clause in bool query, this still selects documents that contain undesirable terms,
+        /// but reduces their overall score.
+        /// </summary>
+        /// <param name="positive">The positive query.</param>
+        /// <param name="negative">The negative query.</param>
+        /// <param name="negativeBoost">The negative boost factor for this query.</param>
+        /// <returns></returns>
+        public object Boosting(object positive = null, object negative = null, float? negativeBoost = null)
+        {
+            return new
+            {
+                boosting = new Map
+                {
+                    { "positive", positive, positive != null },
+                    { "negative", negative, negative != null },
+                    { "negative_boost", negativeBoost, negativeBoost.HasValue }
+                }
+            };
         }
     }
 }
