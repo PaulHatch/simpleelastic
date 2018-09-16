@@ -10,7 +10,7 @@ namespace SimpleElastic
     /// A thread-safe pool of host URIs, calls to <see cref="Next"/> return
     /// the next host URI in a round-robin pattern.
     /// </summary>
-    public sealed class HostPoolProvider : IHostProvider
+    public class HostPoolProvider : IHostProvider
     {
         private readonly List<Uri> _hosts = new List<Uri>();
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();

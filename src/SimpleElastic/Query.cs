@@ -9,8 +9,29 @@ namespace SimpleElastic
     /// <summary>
     /// Helper class for generating queries.
     /// </summary>
-    public class Query
+    public static class Query
     {
+        // Implementation node: No method in this class should call another
+        // method of this class.
+
+        /// <summary>
+        /// Create a new match all query.
+        /// </summary>
+        /// <returns>An object representing a new match all query.</returns>
+        public static object MatchAll()
+        {
+            return new { match_all = new { } };
+        }
+
+        /// <summary>
+        /// Create a new match none query.
+        /// </summary>
+        /// <returns>An object representing a new match none query.</returns>
+        public static object MatchNone()
+        {
+            return new { match_none = new { } };
+        }
+
         /// <summary>
         /// Create a term query which finds documents that contain the exact term specified
         /// in the inverted index.
@@ -21,7 +42,7 @@ namespace SimpleElastic
         /// Optional boost parameter to give this term query a higher relevance score than another query.
         /// </param>
         /// <returns>An object representing a term query.</returns>
-        public object Term(string field, object value, float? boost = null)
+        public static object Term(string field, object value, float? boost = null)
         {
             if (boost.HasValue)
             {
@@ -43,7 +64,7 @@ namespace SimpleElastic
         /// Optional boost parameter to give this terms query a higher relevance score than another query.
         /// </param>
         /// <returns>An object representing a terms query.</returns>
-        public object Terms(string field, IEnumerable<object> values, float? boost = null)
+        public static object Terms(string field, IEnumerable<object> values, float? boost = null)
         {
             if (boost.HasValue)
             {
@@ -71,7 +92,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing a terms query.
         /// </returns>
-        public object Terms(string field, string index, object id, string path, string type = null, float? boost = null, string routing = null)
+        public static object Terms(string field, string index, object id, string path, string type = null, float? boost = null, string routing = null)
         {
             var terms = new Map()
             {
@@ -96,7 +117,7 @@ namespace SimpleElastic
         /// Optional boost parameter to give this terms query a higher relevance score than another query.
         /// </param>
         /// <returns>An object representing a terms query.</returns>
-        public object Range(
+        public static object Range(
             string field,
             string gt = null,
             string lt = null,
@@ -125,7 +146,7 @@ namespace SimpleElastic
         /// </summary>
         /// <param name="field">The field to check.</param>
         /// <returns>An object representing an exists query.</returns>
-        public object Exists(string field)
+        public static object Exists(string field)
         {
             return new { exists = new { field = field } };
 
@@ -142,7 +163,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing a prefix query.
         /// </returns>
-        public object Prefix(string field, string value, float? boost = null, string rewrite = null)
+        public static object Prefix(string field, string value, float? boost = null, string rewrite = null)
         {
             return new
             {
@@ -168,7 +189,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing a wildcard query.
         /// </returns>
-        public object Wildcard(string field, string value, float? boost = null, string rewrite = null)
+        public static object Wildcard(string field, string value, float? boost = null, string rewrite = null)
         {
             return new
             {
@@ -194,7 +215,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing a regex query.
         /// </returns>
-        public object Regex(string field, string value, float? boost = null, string flags = null)
+        public static object Regex(string field, string value, float? boost = null, string flags = null)
         {
             return new
             {
@@ -223,7 +244,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing a fuzzy query.
         /// </returns>
-        public object Fuzzy(
+        public static object Fuzzy(
             string field,
             string value,
             float? boost = null,
@@ -251,7 +272,7 @@ namespace SimpleElastic
         /// </summary>
         /// <param name="ids">The document IDs to filter by.</param>
         /// <returns>An object representing an IDs query.</returns>
-        public object Ids(IEnumerable<object> ids)
+        public static object Ids(IEnumerable<object> ids)
         {
             return new { ids = new { values = ids } };
         }
@@ -266,7 +287,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing a constant score query.
         /// </returns>
-        public object ConstantScore(object filter, float boost)
+        public static object ConstantScore(object filter, float boost)
         {
             return new { constant_score = new { filter = filter, boost = boost } };
         }
@@ -291,7 +312,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing a bool query.
         /// </returns>
-        public object Bool(
+        public static object Bool(
             IEnumerable<object> must = null,
             IEnumerable<object> mustNot = null,
             IEnumerable<object> should = null,
@@ -401,7 +422,7 @@ namespace SimpleElastic
         /// multiple fields, without confusing this with the better case of two different terms in the multiple 
         /// fields.The default tie_breaker is 0.0.</param>
         /// <returns>An object representing a disjunction-max query.</returns>
-        public object DisMax(IEnumerable<object> queries, float? boost = null, float? tieBreaker = null)
+        public static object DisMax(IEnumerable<object> queries, float? boost = null, float? tieBreaker = null)
         {
             return new
             {
@@ -429,7 +450,7 @@ namespace SimpleElastic
         /// <param name="minScore">The minimum score for this query.</param>
         /// <param name="maxBoost">The maximum boost for this query.</param>
         /// <returns></returns>
-        public object FunctionScore(
+        public static object FunctionScore(
             IEnumerable<object> functions,
             object query,
             string scoreMode = null,
@@ -462,7 +483,7 @@ namespace SimpleElastic
         /// <param name="negative">The negative query.</param>
         /// <param name="negativeBoost">The negative boost factor for this query.</param>
         /// <returns></returns>
-        public object Boosting(object positive = null, object negative = null, float? negativeBoost = null)
+        public static object Boosting(object positive = null, object negative = null, float? negativeBoost = null)
         {
             return new
             {

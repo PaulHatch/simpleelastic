@@ -10,7 +10,7 @@ namespace SimpleElastic
     /// Represents a request for a document action within a bulk action request.
     /// </summary>
     [JsonConverter(typeof(BulkActionRequestConverter))]
-    public sealed class BulkActionRequest
+    public class BulkActionRequest
     {
         /// <summary>
         /// Represents a request for a document action within a bulk action request.

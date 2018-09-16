@@ -7,7 +7,7 @@ namespace SimpleElastic
     /// <summary>
     /// Connection provider which contains a single host.
     /// </summary>
-    public sealed class SingleHostProvider : IHostProvider
+    public class SingleHostProvider : IHostProvider
     {
         private Uri _host;
 

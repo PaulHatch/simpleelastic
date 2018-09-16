@@ -4,7 +4,7 @@ namespace SimpleElastic
 {
     /// <summary>
     /// Defines a connection provider which supplies host endpoints
-    /// to the elasticsearch client.
+    /// to the Elasticsearch client.
     /// </summary>
     public interface IHostProvider
     {

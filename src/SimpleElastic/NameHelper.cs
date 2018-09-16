@@ -72,7 +72,7 @@ namespace SimpleElastic
     public static class NameHelper
     {
         /// <summary>
-        /// Use to get the elasticsearch property name of a class
+        /// Use to get the Elasticsearch property name of a class
         /// property name. Converts the name of a property to the
         /// name used when serializing the property to JSON.
         /// </summary>

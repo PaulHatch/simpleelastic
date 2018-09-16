@@ -14,7 +14,7 @@ namespace SimpleElastic
         /// Gets the key for this document.
         /// </summary>
         [JsonIgnore]
-        object Key { get; }
+        object Key { get; set; }
     }
 
     /// <summary>
@@ -26,12 +26,27 @@ namespace SimpleElastic
         /// <summary>
         /// Gets or sets the ID for this document.
         /// </summary>
-        [JsonProperty("_id")]
-        TKey Key { get; set; }
+        [JsonIgnore]
+        public TKey Key { get; set; }
 
         /// <summary>
         /// Gets the ID for this document.
         /// </summary>
-        object IKeyDocument.Key => Key;
+        object IKeyDocument.Key
+        {
+            get { return Key; }
+            set
+            {
+                switch (value)
+                {
+                    case TKey key:
+                        Key = key;
+                        break;
+                    default:
+                        Key = (TKey)Convert.ChangeType(value, typeof(TKey));
+                        break;
+                }
+            }
+        }
     }
 }

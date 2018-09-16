@@ -49,15 +49,8 @@ namespace SimpleElastic.Converters
                                 result.StatusCode = reader.ReadAsInt32().Value;
                                 break;
                             case "error":
-                                var depth = reader.Depth;
-                                while (reader.Read() && reader.Depth >= depth)
-                                {
-                                    if (reader.TokenType == JsonToken.PropertyName && reader.Value as string == "message")
-                                    {
-                                        // TODO: this will override errors with nested errors, but it is good enough for now
-                                        result.Error = reader.ReadAsString();
-                                    }
-                                }
+                                reader.Read();
+                                result.Error = serializer.Deserialize<ErrorResult.RootErrorDetail>(reader);
                                 break;
                             default:
                                 break;

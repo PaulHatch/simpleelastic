@@ -38,14 +38,10 @@ namespace SimpleElastic
         /// Gets the result status code.
         /// </summary>
         public int StatusCode { get; internal set; }
-
-        //public int TotalShards { get; internal set; }
-        //public int SuccessfulShards { get; internal set; }
-        //public int FailedShards { get; internal set; }
-
+        
         /// <summary>
         /// Gets the error message, if any.
         /// </summary>
-        public string Error { get; internal set; }
+        public ErrorResult.RootErrorDetail Error { get; internal set; }
     }
 }

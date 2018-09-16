@@ -6,11 +6,16 @@ namespace SimpleElastic
 {
     /// <summary>
     /// Represents an HTTP exception (inherits from <see cref="System.Net.Http.HttpRequestException"/>)
-    /// during a request to elasticsearch.
+    /// during a request to Elasticsearch.
     /// </summary>
     /// <seealso cref="System.Net.Http.HttpRequestException" />
     public class SimpleElasticHttpException : HttpRequestException
     {
+        /// <summary>
+        /// Gets or sets the error response.
+        /// </summary>
+        public ErrorResult Response { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleElasticHttpException"/> class.
         /// </summary>

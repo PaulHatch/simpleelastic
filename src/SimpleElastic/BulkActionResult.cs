@@ -11,7 +11,7 @@ namespace SimpleElastic
     public class BulkActionResult
     {
         /// <summary>
-        /// Gets the time the request took on elasticsearch.
+        /// Gets the time the request took on Elasticsearch.
         /// </summary>
         [JsonProperty("took"), JsonConverter(typeof(TimeSpanConveter))]
         public TimeSpan Took { get; internal set; }

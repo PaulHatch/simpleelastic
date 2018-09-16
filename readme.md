@@ -1,9 +1,9 @@
 
 # SimpleElastic Elasticsearch Client
 
-This is a .NET client for elasticsearch. Compared to NEST, the official .NET client,
+This is a .NET client for Elasticsearch. Compared to NEST, the official .NET client,
 it is designed to be a lightweight minimal abstraction which exposes the underlying
-elasticsearch API to the developer. This means when you are referencing the API 
+Elasticsearch API to the developer. This means when you are referencing the API 
 documentation you can write code that more or less resembles the JSON directly, rather
 than needing to figure out your query in JSON first then translate it to a NEST query.
 
@@ -18,7 +18,7 @@ This project is a work in progress in pre-alpha status, not ready for use yet.
 
 # Types and Serialization
 
-In SimpleElastic generally follows the pattern that requests to elasticsearch is untyped and
+In SimpleElastic generally follows the pattern that requests to Elasticsearch is untyped and
 open, while responses are serialized to specific response types. The main search method for
 example uses the following signature:
 
@@ -37,16 +37,16 @@ generate the query body.
 
 ## Why Use System.Object for Query Definition?
 
-The elasticsearch query language does not lend itself to being modeled as an set of .NET
+The Elasticsearch query language does not lend itself to being modeled as an set of .NET
 objects in my opinion. Any attempt to provide a fluent interface is impeded by the need 
 to create nested object definitions, creating delegates within delegates. While there is
 some convenience in being able to utilize the typeahead system when composing queries,
 "translating" JSON queries written for example in Kibana is not particularly intuitive.
-The problem is that much worse for the fact the elasticsearch queries contain many small
+The problem is that much worse for the fact the Elasticsearch queries contain many small
 objects for which an obvious name does not exist.
 
 A non-fluent approach which still provides the language as a type model loses the benefits
-of typeahead discoverability, and adds a lot of extra noise to queries. An elasticsearch
+of typeahead discoverability, and adds a lot of extra noise to queries. An Elasticsearch
 query may have many small objects which do not have an obvious name, and these may have 
 many different potential properties. Combine this with .NET naming guidelines favoring 
 more verbose, non-abbreviated type names and you get a lot of clutter in your code. And yet
@@ -157,7 +157,7 @@ Will be serialized as a `FlatObject` with the following keys:
 ## Name Helper
 
 The `NameHelper` provides the `ToName<TDocument>` extension method to obtain the property
-name that will be used when the object is serialized for elasticsearch. For example, 
+name that will be used when the object is serialized for Elasticsearch. For example, 
 given the class:
 
 ```csharp
@@ -182,6 +182,6 @@ custom naming strategy, or will fall back to the global default if none was spec
 # Version Support
 
 Since the queries are user generated, it is up to consumers to create queries which are
-compatible with the version of elasticsearch you are using. The minimal models and conventions
+compatible with the version of Elasticsearch you are using. The minimal models and conventions
 which are present support conventions which are generally stable, these are based on the 
 documentation from the latest release (6.4).

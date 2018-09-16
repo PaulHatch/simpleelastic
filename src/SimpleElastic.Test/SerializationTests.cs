@@ -153,5 +153,18 @@ namespace SimpleElastic.Test
             Assert.Equal(4, result.Items.Count());
         }
 
+        [Fact]
+        public void AcknowledgeResultDeserializedCorrectly()
+        {
+            var json = "{\"acknowledged\":true,\"shards_acknowledged\":true,\"index\":\"test\"}";
+            var result = JsonConvert.DeserializeObject<AcknowledgeResult>(json);
+
+            Assert.True(result.Acknowledged);
+            Assert.True(result.Properties.ContainsKey("shards_acknowledged"));
+            Assert.True(result.Properties.ContainsKey("index"));
+            Assert.Equal(true, result.Properties["shards_acknowledged"]);
+            Assert.Equal("test", result.Properties["index"]);
+        }
+
     }
 }
