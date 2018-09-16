@@ -20,7 +20,16 @@ namespace SimpleElastic.Test
             public string Field2 { get; set; }
         }
 
-        [Fact, Order(0)]
+        [Fact, Order(1)]
+        public async Task CanCheckForNotExistingIndex()
+        {
+            var result = await _client.IndexExistsAsync(_indexName);
+
+            Assert.False(result);
+        }
+
+
+        [Fact, Order(2)]
         public async Task CanCreateIndex()
         {
             var result = await _client.CreateIndexAsync(_indexName, new
@@ -60,7 +69,7 @@ namespace SimpleElastic.Test
             Assert.True(result.Acknowledged);
         }
 
-        [Fact, Order(1)]
+        [Fact, Order(3)]
         public async Task CanGetIndex()
         {
             var result = await _client.GetIndexAsync(_indexName);
@@ -68,7 +77,7 @@ namespace SimpleElastic.Test
             Assert.NotNull(result[_indexName].Aliases["alias_2"]);
         }
 
-        [Fact, Order(2)]
+        [Fact, Order(4)]
         public async Task CanBulkUpdateIndex()
         {
             var result = await _client.BulkActionAsync(_indexName, "_doc", BulkActionType.Create, new[] {
@@ -86,6 +95,14 @@ namespace SimpleElastic.Test
             });
         }
 
+        [Fact, Order(5)]
+        public async Task CanCheckForExistingIndex()
+        {
+            var result = await _client.IndexExistsAsync(_indexName);
+
+            Assert.True(result);
+        }
+        
         [Fact, Order(100)]
         public async Task CanSearch()
         {

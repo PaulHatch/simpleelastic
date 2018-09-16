@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -196,16 +197,30 @@ namespace SimpleElastic
         /// <summary>
         /// Executes a delete index request.
         /// </summary>
-        /// <param name="indexName">Name of the index to delete.</param>
+        /// <param name="index">Name of the index to delete.</param>
         /// <param name="cancel">A cancellation token for the request.</param>
         /// <returns>The acknowledgment result.</returns>
-        public Task<AcknowledgeResult> DeleteIndexAsync(string indexName, CancellationToken cancel = default(CancellationToken))
+        public Task<AcknowledgeResult> DeleteIndexAsync(string index, CancellationToken cancel = default(CancellationToken))
         {
-            var requestUri = new Uri(_hostProvider.Next() + indexName);
+            var requestUri = new Uri(_hostProvider.Next() + index);
             return MakeRequestAsync<AcknowledgeResult>(
                 HttpMethod.Delete,
                 requestUri,
                 cancel);
+        }
+
+        /// <summary>
+        /// Executes a request to check if an index exists.
+        /// </summary>
+        /// <param name="index">Name of the index to check for.</param>
+        /// <param name="cancel">A cancellation token for the request.</param>
+        /// <returns>True if the check was successful, false if 404 was returned.</returns>
+        public async Task<bool> IndexExistsAsync(string index, CancellationToken cancel = default(CancellationToken))
+        {
+            var requestUri = new Uri(_hostProvider.Next() + index);
+            var result = await MakeRequestAsync(HttpMethod.Head, requestUri, cancel);
+
+            return result == HttpStatusCode.OK;
         }
 
         /// <summary>
@@ -341,14 +356,32 @@ namespace SimpleElastic
         }
 
         /// <summary>
+        /// Makes an HTTP request without a body that does not expect a response body.
+        /// </summary>
+        private async Task<HttpStatusCode> MakeRequestAsync(HttpMethod method, Uri requestUri, CancellationToken cancel)
+        {
+            using (var request = new HttpRequestMessage(method, requestUri))
+            using (var response = await _client.SendAsync(request, cancel))
+            {
+                return response.StatusCode;
+            }
+        }
+
+        /// <summary>
         /// Makes an HTTP request with a body.
         /// </summary>
         private async Task<T> MakeRequestAsync<T>(HttpMethod method, Uri requestUri, string requestContent, string mediaType, CancellationToken cancel)
         {
-            using (var content = new StringContent(requestContent, Encoding.Default, mediaType))
-            using (var request = new HttpRequestMessage(method, requestUri) { Content = content })
+            using (var content = new StringContent(requestContent))
             {
-                return await MakeRequestAsync<T>(request, cancel);
+                // Specifying the charset as UTF-8 breaks elasticsearch, set it without
+                // here explicitly for now.
+                // https://github.com/elastic/elasticsearch/issues/28123
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mediaType);
+                using (var request = new HttpRequestMessage(method, requestUri) { Content = content })
+                {
+                    return await MakeRequestAsync<T>(request, cancel);
+                }
             }
         }
 
