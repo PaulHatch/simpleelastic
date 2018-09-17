@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace SimpleElastic
 {
@@ -50,5 +51,14 @@ namespace SimpleElastic
         /// </summary>
         [JsonProperty("fields")]
         public IDictionary<string, object> Fields { get; set; }
+
+        [OnDeserialized]
+        internal void OnDeserialized(StreamingContext context)
+        {
+            if (Source is IKeyDocument keyDocument)
+            {
+                keyDocument.Key = ID;
+            }
+        }
     }
 }

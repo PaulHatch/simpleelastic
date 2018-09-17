@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -102,7 +103,46 @@ namespace SimpleElastic.Test
 
             Assert.True(result);
         }
-        
+
+        [Fact, Order(6)]
+        public async Task CanCloseIndex()
+        {
+            var result = await _client.CloseIndexAsync(_indexName);
+            Assert.True(result.Acknowledged);
+
+            var exception = await Assert.ThrowsAsync<SimpleElasticHttpException>(async () =>
+            {
+                await _client.SearchAsync<TestIndex>(_indexName, null);
+            });
+
+            Assert.Equal((int)HttpStatusCode.BadRequest, exception.Response.Status);
+        }
+
+        [Fact, Order(7)]
+        public async Task CanOpenIndex()
+        {
+            var result = await _client.OpenIndexAsync(_indexName);
+            Assert.True(result.Acknowledged);
+
+            // Let the index reopen
+            await Task.Delay(100);
+
+            var confirmation = await _client.SearchAsync<TestIndex>(_indexName, null);
+
+            Assert.True(confirmation.Total > 0);
+        }
+
+        [Fact, Order(8)]
+        public async Task CanGetItem()
+        {
+            var result = await _client.GetAsync<TestIndex>(_indexName, "_doc", 1);
+
+            Assert.True(result.Found);
+            Assert.Equal("1", result.ID);
+            Assert.Equal(1, result.Source.Key);
+        }
+
+
         [Fact, Order(100)]
         public async Task CanSearch()
         {

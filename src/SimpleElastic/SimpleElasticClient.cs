@@ -81,16 +81,28 @@ namespace SimpleElastic
         /// <param name="options">The options for the search query.</param>
         /// <param name="cancel">A cancellation token for the request.</param>
         /// <returns>The result of the requested search.</returns>
-        public async Task<SearchResult<TSource>> SearchAsync<TSource>(string index, object query, object options = null, CancellationToken cancel = default(CancellationToken))
+        public async Task<SearchResult<TSource>> SearchAsync<TSource>(string index, object query = null, object options = null, CancellationToken cancel = default(CancellationToken))
         {
             var requestUri = new Uri(_hostProvider.Next() + $"{index}/_search{QueryStringParser.GetQueryString(options)}");
 
-            var result = await MakeRequestAsync<SearchResponse<TSource>>(
-                HttpMethod.Post,
-                requestUri,
-                JsonConvert.SerializeObject(query, _jsonSettings),
-                MediaTypes.ApplicationJson,
-                cancel);
+            SearchResponse<TSource> result;
+            if (query == null)
+            {
+                result = await MakeRequestAsync<SearchResponse<TSource>>(
+                    HttpMethod.Get,
+                    requestUri,
+                    cancel);
+            }
+            else
+            {
+                result = await MakeRequestAsync<SearchResponse<TSource>>(
+                    HttpMethod.Post,
+                    requestUri,
+                    JsonConvert.SerializeObject(query, _jsonSettings),
+                    MediaTypes.ApplicationJson,
+                    cancel);
+            }
+
 
             return new SearchResult<TSource>(
                 hits: result.Hits.Hits.Select(h =>
@@ -129,7 +141,7 @@ namespace SimpleElastic
         public Task<GetResult<TSource>> GetAsync<TSource>(
             string index,
             string document,
-            string id,
+            object id,
             object options = null,
             CancellationToken cancel = default(CancellationToken))
         {
@@ -221,6 +233,38 @@ namespace SimpleElastic
             var result = await MakeRequestAsync(HttpMethod.Head, requestUri, cancel);
 
             return result == HttpStatusCode.OK;
+        }
+
+        /// <summary>
+        /// Executes an close index request.
+        /// </summary>
+        /// <param name="index">Name of the index to close.</param>
+        /// <param name="options">The options for the request.</param>
+        /// <param name="cancel">A cancellation token for the request.</param>
+        /// <returns>The acknowledgment result.</returns>
+        public Task<AcknowledgeResult> CloseIndexAsync(string index, CancellationToken cancel = default(CancellationToken))
+        {
+            var requestUri = new Uri(_hostProvider.Next() + $"{index}/_close");
+            return MakeRequestAsync<AcknowledgeResult>(
+                HttpMethod.Post,
+                requestUri,
+                cancel);
+        }
+
+        /// <summary>
+        /// Executes an open index request.
+        /// </summary>
+        /// <param name="index">Name of the index to open.</param>
+        /// <param name="options">The options for the request.</param>
+        /// <param name="cancel">A cancellation token for the request.</param>
+        /// <returns>The acknowledgment result.</returns>
+        public Task<AcknowledgeResult> OpenIndexAsync(string index, CancellationToken cancel = default(CancellationToken))
+        {
+            var requestUri = new Uri(_hostProvider.Next() + $"{index}/_open");
+            return MakeRequestAsync<AcknowledgeResult>(
+                HttpMethod.Post,
+                requestUri,
+                cancel);
         }
 
         /// <summary>
@@ -396,7 +440,7 @@ namespace SimpleElastic
                 {
                     var errorResponse = await response.Content.ReadAsStringAsync();
                     var error = JsonConvert.DeserializeObject<ErrorResult>(errorResponse);
-                    throw new SimpleElasticHttpException($"Error {response.StatusCode} {response.ReasonPhrase}, {error.Error.Type}: {error.Error.Reason}")
+                    throw new SimpleElasticHttpException($"Error {response.StatusCode}, {error.Error.Type}: {error.Error.Reason}")
                     {
                         Response = error
                     };
