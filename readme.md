@@ -1,6 +1,8 @@
 
 # SimpleElastic Elasticsearch Client
 
+[![NuGet version (SimpleElastic)](https://img.shields.io/nuget/v/SimpleElastic.svg?style=flat-square)](https://www.nuget.org/packages/SimpleElastic/)
+
 This is a .NET client for Elasticsearch. Compared to NEST, the official .NET client,
 it is designed to be a lightweight minimal abstraction which exposes the underlying
 Elasticsearch API to the developer. This means when you are referencing the API 
@@ -11,10 +13,6 @@ This client depart most substantially from others in that a type model of the qu
 command language itself is not provided. Most API methods such as `_search` which use a
 body simply accept an object which is serialized using Json.NET. There is no attempt made
 to use the type system to enforce correctly formed queries.
-
-## Current Status
-
-This project is a work in progress in pre-alpha status, not ready for use yet.
 
 # Types and Serialization
 

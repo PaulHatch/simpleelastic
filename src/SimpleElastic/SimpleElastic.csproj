@@ -6,7 +6,6 @@
     <Description>Elasticsearch LiteClient is a lightweight, low-abstraction alternative to the official Elasticsearch.NET/NEST.</Description>
     <Copyright>2018 Paul Hatcherian</Copyright>
     <RepositoryUrl>https://github.com/PaulHatch/simpleelastic.git</RepositoryUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Paul Hatcherian</Authors>
     <Company />
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
@@ -16,6 +15,8 @@
     <PackageIconUrl>https://github.com/PaulHatch/simpleelastic/raw/master/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/PaulHatch/simpleelastic</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/PaulHatch/simpleelastic/master/license.txt</PackageLicenseUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1'">
