@@ -18,7 +18,7 @@ namespace SimpleElastic.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var result = new Aggregation();
+            var result = new AggregationResult();
             while (reader.Read())
             {
                 switch (reader.TokenType)
@@ -48,7 +48,7 @@ namespace SimpleElastic.Converters
                             default:
                                 if (reader.TokenType == JsonToken.StartObject)
                                 {
-                                    var agg = serializer.Deserialize<Aggregation>(reader);
+                                    var agg = serializer.Deserialize<AggregationResult>(reader);
                                     result.AddAggregation(name, agg);
                                 }
                                 break;

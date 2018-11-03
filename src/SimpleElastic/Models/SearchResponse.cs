@@ -15,7 +15,7 @@ namespace SimpleElastic.Models
         public long Took { get; set; }
 
         [JsonProperty("aggregations")]
-        public Dictionary<string, Aggregation> Aggregations { get; set; }
+        public Dictionary<string, AggregationResult> Aggregations { get; set; }
 
         [JsonProperty("suggest")]
         public Dictionary<string, IEnumerable<SearchSuggestion>> Suggestions { get; set; }

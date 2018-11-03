@@ -14,7 +14,7 @@ namespace SimpleElastic
         internal SearchResult(
             IEnumerable<TDocument> hits,
             long total,
-            IReadOnlyDictionary<string, Aggregation> aggregations,
+            IReadOnlyDictionary<string, AggregationResult> aggregations,
             IReadOnlyDictionary<string, SuggestionResult> suggestions)
         {
             Hits = hits;
@@ -36,7 +36,7 @@ namespace SimpleElastic
         /// <summary>
         /// Gets the aggregations for this search.
         /// </summary>
-        public IReadOnlyDictionary<string, Aggregation> Aggregations { get; }
+        public IReadOnlyDictionary<string, AggregationResult> Aggregations { get; }
 
         /// <summary>
         /// Gets the suggestions from this search.

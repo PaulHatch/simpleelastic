@@ -9,7 +9,7 @@ namespace SimpleElastic
     /// </summary>
     public abstract class AggregationBase
     {
-        private IDictionary<string, Aggregation> _subAggregations;
+        private IDictionary<string, AggregationResult> _subAggregations;
 
         /// <summary>
         /// Gets the sub aggregation results for this aggregation.
@@ -17,20 +17,20 @@ namespace SimpleElastic
         /// <remarks>
         /// Accessing this property is not thread safe.
         /// </remarks>
-        public IReadOnlyDictionary<string, Aggregation> SubAggregations
+        public IReadOnlyDictionary<string, AggregationResult> SubAggregations
         {
             get
             {
-                return (IReadOnlyDictionary<string, Aggregation>)_subAggregations
-                    ?? EmptyDictionary<string, Aggregation>.Instance;
+                return (IReadOnlyDictionary<string, AggregationResult>)_subAggregations
+                    ?? EmptyDictionary<string, AggregationResult>.Instance;
             }
         }
 
-        internal void AddAggregation(string name, Aggregation aggregation)
+        internal void AddAggregation(string name, AggregationResult aggregation)
         {
             if (_subAggregations == null)
             {
-                _subAggregations = new Dictionary<string, Aggregation>();
+                _subAggregations = new Dictionary<string, AggregationResult>();
             }
             _subAggregations.Add(name, aggregation);
         }

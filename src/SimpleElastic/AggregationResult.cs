@@ -10,7 +10,7 @@ namespace SimpleElastic
     /// Aggregation result of a query.
     /// </summary>
     [JsonConverter(typeof(AggregationConverter))]
-    public class Aggregation : AggregationBase
+    public class AggregationResult : AggregationBase
     {
         private IEnumerable<AggregationBucket> _buckets;
 
