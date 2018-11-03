@@ -13,6 +13,9 @@
     <FileVersion>1.0.0.0</FileVersion>
     <RepositoryType>git</RepositoryType>
     <PackageTags>elasticsearch elastic search client</PackageTags>
+    <PackageIconUrl>https://github.com/PaulHatch/simpleelastic/raw/master/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/PaulHatch/simpleelastic</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/PaulHatch/simpleelastic/master/license.txt</PackageLicenseUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1'">
