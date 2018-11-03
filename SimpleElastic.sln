@@ -5,8 +5,14 @@ VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{27BB6916-A533-4340-AF8E-913DF0BA4F11}"
 	ProjectSection(SolutionItems) = preProject
+		.gitlab-ci.yml = .gitlab-ci.yml
+		build.sh = build.sh
+		docker-compose.integration.yml = docker-compose.integration.yml
+		Dockerfile = Dockerfile
+		init.sh = init.sh
 		license.txt = license.txt
 		readme.md = readme.md
+		semver.sh = semver.sh
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleElastic", "src\SimpleElastic\SimpleElastic.csproj", "{3FE33523-7CF1-474F-967E-BB652003DEFB}"
@@ -30,10 +36,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{3FE33523-7CF1-474F-967E-BB652003DEFB} = {27BB6916-A533-4340-AF8E-913DF0BA4F11}
-		{85DB8DA6-2A7B-4029-9076-5DA685B22622} = {27BB6916-A533-4340-AF8E-913DF0BA4F11}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23839FE5-600C-4630-AC3B-0C238F9FEDF1}

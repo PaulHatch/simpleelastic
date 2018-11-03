@@ -1,0 +1,19 @@
+version: "3"
+services:
+    test:
+        image: ${IMAGE_TAG}
+        environment:
+          SERVER_NAME: "http://es:9200"
+        depends_on:
+          - es
+        command: --integration
+        labels:
+          - test
+        links:
+          - es
+    es:
+        image: "docker.elastic.co/elasticsearch/elasticsearch:6.4.2"
+        ports:
+          - '9200:9200'
+        environment:
+          - discovery.type=single-node

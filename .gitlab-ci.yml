@@ -1,0 +1,68 @@
+---
+
+image: docker:stable-git
+
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  LATEST_TAG: $CI_REGISTRY_IMAGE:latest
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
+services:
+  - docker:dind
+
+before_script:
+  - docker info
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - chmod +x init.sh
+  - chmod +x semver.sh
+  - apk add --no-cache bash
+  - set -e
+
+stages:
+  - build
+  - test
+  - publish-preview
+  - publish
+
+Build:
+    stage: build
+    script: bash init.sh --build
+    except:
+      - tags
+
+Unit Tests:
+    stage: test
+    except:
+      - tags
+    script:
+     - docker pull $IMAGE_TAG
+     - docker run --name testing $IMAGE_TAG --test
+     - docker cp testing:/sln/results.xml .
+    artifacts:
+      reports:
+        junit: results.xml
+
+Integration Tests:
+    stage: test
+    except:
+      - tags
+    script: 
+      - bash init.sh --integration $IMAGE_TAG
+      - exit $($?)
+    artifacts:
+      reports:
+        junit: results.xml
+
+Publish Preview:
+    stage: publish-preview
+    except:
+      - tags
+    script: bash init.sh --publish-preview
+
+Publish:
+    stage: publish
+    except:
+      - tags
+    when: manual
+    script: bash init.sh --publish

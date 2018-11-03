@@ -7,6 +7,7 @@ using Xunit;
 
 namespace SimpleElastic.Test
 {
+    [Trait("type", "unit")]
     public class NameHelperTests
     {
         [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]

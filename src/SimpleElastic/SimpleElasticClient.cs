@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using OpenTracing;
+using OpenTracing.Tag;
+using OpenTracing.Util;
 using SimpleElastic.Models;
 using System;
 using System.Collections.Generic;
@@ -26,23 +29,50 @@ namespace SimpleElastic
         };
 
         private static readonly Lazy<HttpClient> _defaultClient = new Lazy<HttpClient>(CreateClient);
+
+#if NETSTANDARD
         private static HttpClient CreateClient()
         {
-            return new HttpClient();
+            var handler = new HttpClientHandler
+            {
+                AutomaticDecompression =
+                    DecompressionMethods.Deflate |
+                    DecompressionMethods.GZip
+            };
+            return new HttpClient(handler);
         }
+#endif
+
+#if NETCORE
+        private static HttpClient CreateClient()
+        {
+            var handler = new SocketsHttpHandler
+            {
+                AutomaticDecompression =
+                    DecompressionMethods.Deflate |
+                    DecompressionMethods.GZip
+            };
+            return new HttpClient(handler);
+        }
+#endif
+
 
         private readonly HttpMessageInvoker _client;
         private readonly ILogger _log;
         private readonly JsonSerializerSettings _jsonSettings;
         private readonly IHostProvider _hostProvider;
+        private ITracer _tracer;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleElasticClient" /> class with
         /// the specified configuration.
         /// </summary>
         /// <param name="config">The configuration to use.</param>
-        public SimpleElasticClient(ClientOptions config)
+        /// <param name="tracer">The tracer to use, if null defaults to the global tracer.</param>
+        public SimpleElasticClient(ClientOptions config, ITracer tracer)
         {
+            _tracer = tracer ?? GlobalTracer.Instance;
             _client = config.HttpClient ?? _defaultClient.Value;
             _log = config.Logger ?? NullLogger.Instance;
             _jsonSettings = DefaultJsonSettings;
@@ -50,12 +80,33 @@ namespace SimpleElastic
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleElasticClient" /> class with
+        /// the specified configuration.
+        /// </summary>
+        /// <param name="config">The configuration to use.</param>
+        public SimpleElasticClient(ClientOptions config)
+            : this(config, null)
+        { }
+
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SimpleElasticClient"/> class with
         /// a single specified host and default options.
         /// </summary>
         /// <param name="host">The Elasticsearch host to connect to.</param>
+        /// <param name="tracer">The tracer to use, if null defaults to the global tracer.</param>
+        public SimpleElasticClient(Uri host, ITracer tracer)
+            : this(new ClientOptions(host), tracer)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleElasticClient" /> class with
+        /// a single specified host and default options.
+        /// </summary>
+        /// <param name="host">The Elasticsearch host to connect to.</param>
         public SimpleElasticClient(Uri host)
-            : this(new ClientOptions(host))
+            : this(new ClientOptions(host), null)
         {
         }
 
@@ -64,8 +115,19 @@ namespace SimpleElastic
         /// a single specified host and default options
         /// </summary>
         /// <param name="host">The Elasticsearch host to connect to.</param>
+        /// <param name="tracer">The tracer to use, if null defaults to the global tracer.</param>
+        public SimpleElasticClient(string host, ITracer tracer)
+            : this(new ClientOptions(new Uri(host)), tracer)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleElasticClient" /> class with
+        /// a single specified host and default options
+        /// </summary>
+        /// <param name="host">The Elasticsearch host to connect to.</param>
         public SimpleElasticClient(string host)
-            : this(new ClientOptions(new Uri(host)))
+            : this(new ClientOptions(new Uri(host)), null)
         {
         }
 
@@ -91,7 +153,8 @@ namespace SimpleElastic
                 result = await MakeRequestAsync<SearchResponse<TSource>>(
                     HttpMethod.Get,
                     requestUri,
-                    cancel);
+                    cancel,
+                    "search");
             }
             else
             {
@@ -100,7 +163,8 @@ namespace SimpleElastic
                     requestUri,
                     JsonConvert.SerializeObject(query, _jsonSettings),
                     MediaTypes.ApplicationJson,
-                    cancel);
+                    cancel,
+                    "search");
             }
 
 
@@ -146,7 +210,7 @@ namespace SimpleElastic
             CancellationToken cancel = default(CancellationToken))
         {
             var requestUri = new Uri(_hostProvider.Next() + $"{index}/{document}/{id}{QueryStringParser.GetQueryString(options)}");
-            return MakeRequestAsync<GetResult<TSource>>(HttpMethod.Get, requestUri, cancel);
+            return MakeRequestAsync<GetResult<TSource>>(HttpMethod.Get, requestUri, cancel, "get_doc");
         }
 
         /// <summary>
@@ -170,7 +234,7 @@ namespace SimpleElastic
             CancellationToken cancel = default(CancellationToken))
         {
             var requestUri = new Uri(_hostProvider.Next() + $"{index}/{document}/{id}/_source{QueryStringParser.GetQueryString(options)}");
-            return MakeRequestAsync<TSource>(HttpMethod.Get, requestUri, cancel);
+            return MakeRequestAsync<TSource>(HttpMethod.Get, requestUri, cancel, "get_source");
         }
 
         /// <summary>
@@ -188,7 +252,8 @@ namespace SimpleElastic
                 requestUri,
                 JsonConvert.SerializeObject(settings),
                 MediaTypes.ApplicationJson,
-                cancel);
+                cancel,
+                "create_index");
         }
 
         /// <summary>
@@ -203,7 +268,8 @@ namespace SimpleElastic
             return MakeRequestAsync<IDictionary<string, IndexResult>>(
                 HttpMethod.Get,
                 requestUri,
-                cancel);
+                cancel,
+                "get_index");
         }
 
         /// <summary>
@@ -218,7 +284,8 @@ namespace SimpleElastic
             return MakeRequestAsync<AcknowledgeResult>(
                 HttpMethod.Delete,
                 requestUri,
-                cancel);
+                cancel,
+                "delete_index");
         }
 
         /// <summary>
@@ -230,7 +297,7 @@ namespace SimpleElastic
         public async Task<bool> IndexExistsAsync(string index, CancellationToken cancel = default(CancellationToken))
         {
             var requestUri = new Uri(_hostProvider.Next() + index);
-            var result = await MakeRequestAsync(HttpMethod.Head, requestUri, cancel);
+            var result = await MakeRequestAsync(HttpMethod.Head, requestUri, cancel, "index_exists");
 
             return result == HttpStatusCode.OK;
         }
@@ -248,7 +315,8 @@ namespace SimpleElastic
             return MakeRequestAsync<AcknowledgeResult>(
                 HttpMethod.Post,
                 requestUri,
-                cancel);
+                cancel,
+                "close_index");
         }
 
         /// <summary>
@@ -264,7 +332,8 @@ namespace SimpleElastic
             return MakeRequestAsync<AcknowledgeResult>(
                 HttpMethod.Post,
                 requestUri,
-                cancel);
+                cancel,
+                "open_index");
         }
 
         /// <summary>
@@ -336,7 +405,8 @@ namespace SimpleElastic
                 requestUri,
                 request.ToString(),
                 MediaTypes.ApplicationNewlineDelimittedJson,
-                cancel);
+                cancel,
+                "bulk_action");
         }
 
         /// <summary>
@@ -385,36 +455,49 @@ namespace SimpleElastic
                 requestUri,
                 request.ToString(),
                 MediaTypes.ApplicationNewlineDelimittedJson,
-                cancel);
+                cancel,
+                "bulk_action");
         }
 
         /// <summary>
         /// Makes an HTTP request without a body.
         /// </summary>
-        private async Task<T> MakeRequestAsync<T>(HttpMethod method, Uri requestUri, CancellationToken cancel)
+        private async Task<T> MakeRequestAsync<T>(HttpMethod method, Uri requestUri, CancellationToken cancel, string operationName)
         {
             using (var request = new HttpRequestMessage(method, requestUri))
             {
-                return await MakeRequestAsync<T>(request, cancel);
+                return await MakeRequestAsync<T>(request, cancel, operationName);
             }
         }
 
         /// <summary>
         /// Makes an HTTP request without a body that does not expect a response body.
         /// </summary>
-        private async Task<HttpStatusCode> MakeRequestAsync(HttpMethod method, Uri requestUri, CancellationToken cancel)
+        private async Task<HttpStatusCode> MakeRequestAsync(HttpMethod method, Uri requestUri, CancellationToken cancel, string operationName)
         {
             using (var request = new HttpRequestMessage(method, requestUri))
-            using (var response = await _client.SendAsync(request, cancel))
+            using (var scope = CreateScope(request, operationName))
             {
-                return response.StatusCode;
+                try
+                {
+                    using (var response = await _client.SendAsync(request, cancel))
+                    {
+                        scope.Span.SetTag(Tags.HttpStatus, (int)response.StatusCode);
+                        return response.StatusCode;
+                    }
+                }
+                catch
+                {
+                    scope.Span.SetTag(Tags.Error, true);
+                    throw;
+                }
             }
         }
 
         /// <summary>
         /// Makes an HTTP request with a body.
         /// </summary>
-        private async Task<T> MakeRequestAsync<T>(HttpMethod method, Uri requestUri, string requestContent, string mediaType, CancellationToken cancel)
+        private async Task<T> MakeRequestAsync<T>(HttpMethod method, Uri requestUri, string requestContent, string mediaType, CancellationToken cancel, string operationName)
         {
             using (var content = new StringContent(requestContent))
             {
@@ -424,7 +507,7 @@ namespace SimpleElastic
                 content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mediaType);
                 using (var request = new HttpRequestMessage(method, requestUri) { Content = content })
                 {
-                    return await MakeRequestAsync<T>(request, cancel);
+                    return await MakeRequestAsync<T>(request, cancel, operationName);
                 }
             }
         }
@@ -432,12 +515,16 @@ namespace SimpleElastic
         /// <summary>
         /// Handles HTTP request messages.
         /// </summary>
-        private async Task<T> MakeRequestAsync<T>(HttpRequestMessage request, CancellationToken cancel)
+        private async Task<T> MakeRequestAsync<T>(HttpRequestMessage request, CancellationToken cancel, string operationName)
         {
+            using (var scope = CreateScope(request, operationName))
             using (var response = await _client.SendAsync(request, cancel))
             {
+                scope.Span.SetTag(Tags.HttpStatus, (int)response.StatusCode);
                 if (!response.IsSuccessStatusCode)
                 {
+                    scope.Span.SetTag(Tags.Error, true);
+
                     var errorResponse = await response.Content.ReadAsStringAsync();
                     var error = JsonConvert.DeserializeObject<ErrorResult>(errorResponse);
                     throw new SimpleElasticHttpException($"Error {response.StatusCode}, {error.Error.Type}: {error.Error.Reason}")
@@ -454,6 +541,20 @@ namespace SimpleElastic
                     return deserializer.Deserialize<T>(jsonReader);
                 }
             }
+        }
+
+        private IScope CreateScope(HttpRequestMessage request, string operationName)
+        {
+
+            return _tracer
+                .BuildSpan(operationName)
+                .WithTag(Tags.SpanKind.Key, Tags.SpanKindClient)
+                .WithTag(Tags.DbType, "elasticsearch")
+                .WithTag(Tags.HttpMethod, request.Method.Method)
+                .WithTag(Tags.HttpUrl, request.RequestUri.ToString())
+                //.WithTag(Tags.DbStatement, request.Content)
+                .WithTag(Tags.Component.Key, "simple-elastic")
+                .StartActive(finishSpanOnDispose: true);
         }
     }
 }

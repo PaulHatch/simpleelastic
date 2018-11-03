@@ -8,6 +8,7 @@ using Xunit;
 
 namespace SimpleElastic.Test
 {
+    [Trait("type", "integration")]
     [Collection("integration-test")]
     [TestCaseOrderer(IntegrationTestCaseOrderer.TypeName, IntegrationTestCaseOrderer.AssemblyName)]
     public class IntegrationTest

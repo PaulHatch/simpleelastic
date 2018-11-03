@@ -10,6 +10,7 @@ using Xunit;
 
 namespace SimpleElastic.Test
 {
+    [Trait("type", "unit")]
     public class SearchTests
     {
         // Result of aggregation query with a sub aggregation on "field1" and "field2" of a "sample" index

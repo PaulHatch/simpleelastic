@@ -6,6 +6,7 @@ using Xunit;
 
 namespace SimpleElastic.Test
 {
+    [Trait("type", "unit")]
     public class SerializationTests
     {
         private class TestDocument

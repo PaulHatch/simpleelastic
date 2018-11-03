@@ -1,20 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.1.0</Version>
+    <TargetFrameworks>netcoreapp2.1;netstandard2.0</TargetFrameworks>
+    <Version>1.0.0</Version>
     <Description>Elasticsearch LiteClient is a lightweight, low-abstraction alternative to the official Elasticsearch.NET/NEST.</Description>
     <Copyright>2018 Paul Hatcherian</Copyright>
-    <RepositoryUrl>https://github.com/PaulHatch/elasticsearch-lite</RepositoryUrl>
+    <RepositoryUrl>https://github.com/PaulHatch/simpleelastic.git</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Paul Hatcherian</Authors>
     <Company />
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>elasticsearch elastic search client</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1'">
+    <DefineConstants>NETCORE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="OpenTracing" Version="0.12.0" />
   </ItemGroup>
 
 </Project>
