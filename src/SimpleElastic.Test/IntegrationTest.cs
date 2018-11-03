@@ -13,8 +13,21 @@ namespace SimpleElastic.Test
     [TestCaseOrderer(IntegrationTestCaseOrderer.TypeName, IntegrationTestCaseOrderer.AssemblyName)]
     public class IntegrationTest
     {
-        private static SimpleElasticClient _client = new SimpleElasticClient("http://localhost:9200");
+        private static SimpleElasticClient _client;
         private static string _indexName = $"integration__test__{DateTime.UtcNow.Ticks}";
+
+        public IntegrationTest()
+        {
+            var url = Environment.GetEnvironmentVariable("SERVER_NAME");
+            if (String.IsNullOrEmpty(url))
+            {
+                _client = new SimpleElasticClient("http://localhost:9200");
+            }
+            else
+            {
+                _client = new SimpleElasticClient(url);
+            }
+        }
 
         private class TestIndex : KeyDocument<int>
         {
