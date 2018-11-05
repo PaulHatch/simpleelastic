@@ -14,7 +14,6 @@ namespace SimpleElastic.Test
             public FlatObject Test { get; set; }
         }
 
-
         [Fact]
         public void FlattenSerializerBasicTest()
         {
@@ -167,5 +166,37 @@ namespace SimpleElastic.Test
             Assert.Equal("test", result.Properties["index"]);
         }
 
+        [Fact]
+        public void CanDeserializeTable()
+        {
+            var json = "{\"one\":1,\"one\":2,\"two\":\"test\"}";
+            var result = JsonConvert.DeserializeObject<Table>(json);
+
+            Assert.Equal(3, result.Count);
+            Assert.Equal("one", result[0].Key);
+            Assert.Equal("one", result[1].Key);
+            Assert.Equal("two", result[2].Key);
+            Assert.Equal(1L, result[0].Value);
+            Assert.Equal(2L, result[1].Value);
+            Assert.Equal("test", result[2].Value);
+        }
+
+        [Fact]
+        public void CanSerializeTable()
+        {
+            var table = new Table { { "one", 1 }, { "one", 2 } };
+            var result = JsonConvert.SerializeObject(table);
+
+            Assert.Equal("{\"one\":1,\"one\":2}", result);
+        }
+
+        [Fact]
+        public void CanSerializeTableWithObject()
+        {
+            var table = new Table { { "one", new { value = 1 } }, { "one", 2 } };
+            var result = JsonConvert.SerializeObject(table);
+
+            Assert.Equal("{\"one\":{\"value\":1},\"one\":2}", result);
+        }
     }
 }
