@@ -23,6 +23,9 @@ namespace SimpleElastic
     /// </summary>
     public class SimpleElasticClient
     {
+        /// <summary>
+        /// Gets or sets the global default JSON serializer settings.
+        /// </summary>
         public static JsonSerializerSettings DefaultJsonSettings { get; set; } = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -341,21 +344,17 @@ namespace SimpleElastic
         /// assumes you are only performing a single action type on a single index and document type.
         /// </summary>
         /// <param name="index">The index and type.</param>
+        /// <param name="type">The document type.</param>
         /// <param name="actionType">Type of the action.</param>
-        /// <param name="documents">
-        /// The documents, if <see cref="BulkActionType.Index"/> or <see cref="BulkActionType.Create"/>
-        /// is specified, this is the source document to index or create, if <see cref="BulkActionType.Update"/>
-        /// is specified this should be an update statement, and if <see cref="BulkActionType.Delete"/> is specified
-        /// this is either the ID or a document which implements <see cref="IKeyDocument"/>.
-        /// </param>
+        /// <param name="documents">The documents, if <see cref="BulkActionType.Index" /> or <see cref="BulkActionType.Create" />
+        /// is specified, this is the source document to index or create, if <see cref="BulkActionType.Update" />
+        /// is specified this should be an update statement, and if <see cref="BulkActionType.Delete" /> is specified
+        /// this is either the ID or a document which implements <see cref="IKeyDocument" />.</param>
         /// <param name="options">Any options for the request such as 'refresh'.</param>
-        /// <param name="throwOnFailure">
-        /// If true, an exception will be thrown if any of the requested actions fail. (Normally the _bulk
-        /// API endpoint returns a 200 if the request was processed successfully, even if document actions fail.)
-        /// </param>
+        /// <param name="throwOnFailure">If true, an exception will be thrown if any of the requested actions fail. (Normally the _bulk
+        /// API endpoint returns a 200 if the request was processed successfully, even if document actions fail.)</param>
         /// <param name="cancel">A cancellation token for the request.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">An index is required - index</exception>
         public Task<BulkActionResult> BulkActionAsync(string index, string type, BulkActionType actionType, IEnumerable<object> documents, object options = null, bool throwOnFailure = true, CancellationToken cancel = default(CancellationToken))
         {
             if (index == null)

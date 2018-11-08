@@ -112,11 +112,16 @@ namespace SimpleElastic
         /// provided terms (not analyzed).
         /// </summary>
         /// <param name="field">The field to match.</param>
-        /// <param name="values">The values to match exactly.</param>
-        /// <param name="boost">
-        /// Optional boost parameter to give this terms query a higher relevance score than another query.
-        /// </param>
-        /// <returns>An object representing a terms query.</returns>
+        /// <param name="gt">Greater than value..</param>
+        /// <param name="lt">Less than value.</param>
+        /// <param name="gte">Greater than or equal to value.</param>
+        /// <param name="lte">Less than or equal to value.</param>
+        /// <param name="boost">Optional boost parameter to give this terms query a higher relevance score than another query.</param>
+        /// <param name="timeZone">The time zone.</param>
+        /// <param name="format">The format.</param>
+        /// <returns>
+        /// An object representing a terms query.
+        /// </returns>
         public static object Range(
             string field,
             string gt = null,

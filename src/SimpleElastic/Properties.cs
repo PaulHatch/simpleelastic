@@ -14,7 +14,6 @@ namespace SimpleElastic
     /// field of an index mapping request.
     /// </summary>
     /// <typeparam name="TDocument">The type of the document.</typeparam>
-    /// <seealso cref="System.Collections.Generic.IDictionary{System.String, System.Object}" />
     public class Properties<TDocument> : IDictionary<string, object>
     {
         internal IDictionary<string, object> Value { get; } = new Dictionary<string, object>();
