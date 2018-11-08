@@ -26,13 +26,13 @@ namespace SimpleElastic
         /// </summary>
         public BulkActionType Action { get; }
 
-        /// <param name="documents">
+        /// <summary>
         /// Gets or sets the document for this request, if  the action type for the request is 
         /// <see cref="BulkActionType.Index"/> or <see cref="BulkActionType.Create"/>, this is 
         /// the source document to index or create, if it is <see cref="BulkActionType.Update"/>
         /// this should be an update statement, and if it is <see cref="BulkActionType.Delete"/>
-        /// this is either the ID or a document which implements <see cref="IKeyDocument{TKey}"/>.
-        /// </param>
+        /// this is either the ID or a document which implements <see cref="IKeyDocument"/>.
+        /// </summary>
         public object Document { get; set; }
 
         /// <summary>

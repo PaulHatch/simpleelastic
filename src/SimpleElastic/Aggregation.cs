@@ -317,7 +317,7 @@ namespace SimpleElastic
         /// <param name="precision">The precision level between 1-12. High precision geohashes
         /// have a long string length and represent cells that cover only a small area while low
         /// precision geohashes have a short string length and represent cells that each cover a
-        /// large area.<param>
+        /// large area.</param>
         /// <param name="subAggregations">An optional set of sub aggregations for this aggregation.</param>
         /// <returns>
         /// An object representing the requested aggregation.

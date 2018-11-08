@@ -68,7 +68,7 @@ namespace SimpleElastic
         /// Gets or sets the HTTP client to use when making connections.
         /// If none is provided a default HttpClient instance will be used.
         /// This client should be reused, creating a new instance on each
-        /// request will result in degraded performance. <see cref=""/>
+        /// request will result in degraded performance.
         /// </summary>
         public HttpMessageInvoker HttpClient { get; set; }
 

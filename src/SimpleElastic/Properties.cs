@@ -8,10 +8,10 @@ using System.Text;
 namespace SimpleElastic
 {
     /// <summary>
-    /// Helper class representing a specialized <see cref="IDictionary{string, object}" /> which
-    /// automatically applies <see cref="NameHelper.ToName{TDocument}(string)" /> to all
-    /// keys provided using the document type. This class is intended for use as the "properties"
-    /// field of an index mapping request.
+    /// Helper class representing a specialized string/object dictionary which
+    /// automatically applies <see cref="NameHelper.ToName{TDocument}(string)" />
+    /// to all keys provided using the document type. This class is intended for
+    /// use as the "properties" field of an index mapping request.
     /// </summary>
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     public class Properties<TDocument> : IDictionary<string, object>

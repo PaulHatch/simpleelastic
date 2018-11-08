@@ -153,6 +153,7 @@ namespace SimpleElastic.Test
             Assert.Equal(4, result.Items.Count());
         }
 
+#pragma warning disable xUnit2004 // Do not use equality check to test for boolean conditions
         [Fact]
         public void AcknowledgeResultDeserializedCorrectly()
         {
@@ -165,6 +166,7 @@ namespace SimpleElastic.Test
             Assert.Equal(true, result.Properties["shards_acknowledged"]);
             Assert.Equal("test", result.Properties["index"]);
         }
+#pragma warning restore xUnit2004 // Do not use equality check to test for boolean conditions
 
         [Fact]
         public void CanDeserializeTable()

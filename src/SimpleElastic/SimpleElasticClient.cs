@@ -309,7 +309,6 @@ namespace SimpleElastic
         /// Executes an close index request.
         /// </summary>
         /// <param name="index">Name of the index to close.</param>
-        /// <param name="options">The options for the request.</param>
         /// <param name="cancel">A cancellation token for the request.</param>
         /// <returns>The acknowledgment result.</returns>
         public Task<AcknowledgeResult> CloseIndexAsync(string index, CancellationToken cancel = default(CancellationToken))
@@ -326,7 +325,6 @@ namespace SimpleElastic
         /// Executes an open index request.
         /// </summary>
         /// <param name="index">Name of the index to open.</param>
-        /// <param name="options">The options for the request.</param>
         /// <param name="cancel">A cancellation token for the request.</param>
         /// <returns>The acknowledgment result.</returns>
         public Task<AcknowledgeResult> OpenIndexAsync(string index, CancellationToken cancel = default(CancellationToken))

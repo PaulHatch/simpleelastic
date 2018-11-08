@@ -20,6 +20,9 @@ namespace SimpleElastic
         [JsonProperty("status")]
         public int Status { get; set; }
 
+        /// <summary>
+        /// Root details element of an error result.
+        /// </summary>
         public class RootErrorDetail : ErrorDetail
         {
             /// <summary>
@@ -35,6 +38,9 @@ namespace SimpleElastic
             public ErrorDetail CausedBy { get; set; }
         }
 
+        /// <summary>
+        /// Details element of an error result.
+        /// </summary>
         public class ErrorDetail
         {
             /// <summary>
@@ -55,6 +61,12 @@ namespace SimpleElastic
             [JsonProperty("stack_trace")]
             public string StackTrace { get; set; }
 
+            /// <summary>
+            /// Returns a <see cref="System.String" /> that represents this instance.
+            /// </summary>
+            /// <returns>
+            /// A <see cref="System.String" /> that represents this instance.
+            /// </returns>
             public override string ToString()
             {
                 return $"{Type}: {Reason}";

@@ -101,7 +101,7 @@ namespace SimpleElastic
         public static Property Object => new Property("object");
 
         /// <summary>
-        /// Begins a new nested object. The nested type is a specialised version of the object data type that 
+        /// Begins a new nested object. The nested type is a specialized version of the object data type that 
         /// allows arrays of objects to be indexed in a way that they can be queried independently of each other.
         /// </summary>
         public static Property Nested => new Property("nested");
@@ -138,11 +138,10 @@ namespace SimpleElastic
 
         /// <summary>
         /// The normalizer property of keyword fields is similar to analyzer
-        /// except that it guarantees that the analysis chain produces a single token.</param>
-        /// <param name="boost">Individual fields can be boosted automatically — count more towards
-        /// the relevance score — at query time,  with the boost parameter.
+        /// except that it guarantees that the analysis chain produces a single token.
         /// </summary>
         /// <param name="normalizer">The normalizer name.</param>
+        /// <returns></returns>
         public Property Normalizer(string normalizer) => AddTerm("normalizer", normalizer);
 
         /// <summary>
