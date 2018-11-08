@@ -21,7 +21,7 @@ namespace SimpleElastic
         /// </param>
         /// <param name="subAggregations">An optional set of sub aggregations for this aggregation.</param>
         /// <returns>An object representing the requested aggregation.</returns>
-        public static object AdjacencyMatrix(IDictionary<string, object> filters, object subAggregations = null)
+        public static Map AdjacencyMatrix(IDictionary<string, object> filters, object subAggregations = null)
         {
             return new Map("adjacency_matrix",
                 new Map("filters", filters ?? throw new ArgumentNullException(nameof(filters))))
@@ -38,7 +38,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Children(string type, object subAggregations = null)
+        public static Map Children(string type, object subAggregations = null)
         {
             return new Map("children",
                 new Map("type", type ?? throw new ArgumentNullException(nameof(type))))
@@ -63,7 +63,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Composite(IEnumerable<IDictionary<string, object>> sources, object subAggregations = null)
+        public static Map Composite(IEnumerable<IDictionary<string, object>> sources, object subAggregations = null)
         {
             return new Map("composite",
                 new Map("sources", sources ?? throw new ArgumentNullException(nameof(sources))))
@@ -84,7 +84,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object DateHistogram(string field, string interval, object subAggregations = null)
+        public static Map DateHistogram(string field, string interval, object subAggregations = null)
         {
             return new Map("date_histogram", new Map {
                 { "field", field ?? throw new ArgumentNullException(nameof(field)) },
@@ -114,7 +114,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object DateRange(
+        public static Map DateRange(
             string field,
             IDictionary<string, string> ranges,
             string format = null,
@@ -159,7 +159,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object DiversifiedSampler(
+        public static Map DiversifiedSampler(
             string field = null,
             int? shardSize = null,
             int? maxDocsPerValue = null,
@@ -190,7 +190,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Filter(object filter, object subAggregations = null)
+        public static Map Filter(object filter, object subAggregations = null)
         {
             return new Map("filter", filter) { { "aggs", subAggregations, subAggregations != null } };
         }
@@ -208,7 +208,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Filters(
+        public static Map Filters(
             IDictionary<string, object> filters, 
             bool? otherBucket = null, 
             string otherBucketKey = null,
@@ -233,7 +233,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Filters(IEnumerable<object> filters, object subAggregations = null)
+        public static Map Filters(IEnumerable<object> filters, object subAggregations = null)
         {
             return new Map
             {
@@ -253,7 +253,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Filters(params object[] filters)
+        public static Map Filters(params object[] filters)
             => Filter(filters.AsEnumerable(), null);
 
         /// <summary>
@@ -288,7 +288,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object GeoDistance(
+        public static Map GeoDistance(
             string field, 
             object origin, 
             IEnumerable<object> ranges = null, 
@@ -322,7 +322,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object GeoHashgrid(string field, int precision, object subAggregations = null)
+        public static Map GeoHashgrid(string field, int precision, object subAggregations = null)
         {
             return new Map("geohash_grid", new Map {
                 { "field", field ?? throw new ArgumentNullException(nameof(field)) },
@@ -338,7 +338,7 @@ namespace SimpleElastic
         /// </summary>
         /// <param name="subAggregations">An optional set of sub aggregations for this aggregation.</param>
         /// <returns>An object representing the requested aggregation.</returns>
-        public static object Global(object subAggregations = null)
+        public static Map Global(object subAggregations = null)
         {
             return new Map("global", new object())
             {
@@ -371,7 +371,7 @@ namespace SimpleElastic
         /// or
         /// interval</exception>
         /// n&gt;
-        public static object Histogram(
+        public static Map Histogram(
             string field, 
             object interval, 
             object offset = null, 
@@ -407,7 +407,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object IPRange(string field, IEnumerable<object> ranges, bool? keyed, object subAggregations = null)
+        public static Map IPRange(string field, IEnumerable<object> ranges, bool? keyed, object subAggregations = null)
         {
             return new Map("ip_range", new Map
             {
@@ -432,7 +432,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Missing(string field, object subAggregations = null)
+        public static Map Missing(string field, object subAggregations = null)
         {
             return new Map("missing", new Map("field", field))
             {
@@ -448,7 +448,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Nested(string path, object subAggregations = null)
+        public static Map Nested(string path, object subAggregations = null)
         {
             return new Map("nested", new Map
             {
@@ -470,7 +470,7 @@ namespace SimpleElastic
         /// <param name="script">The script.</param>
         /// <param name="subAggregations">The sub aggregations.</param>
         /// <returns></returns>
-        public static object Range(
+        public static Map Range(
             string field = null,
             bool? keyed = null,
             string script = null,
@@ -505,7 +505,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object ReverseNested(string path = null, object subAggregations = null)
+        public static Map ReverseNested(string path = null, object subAggregations = null)
         {
             return new Map("reverse_nested", new Map
             {
@@ -526,7 +526,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Sampler(int? shardSize = null, object subAggregations = null)
+        public static Map Sampler(int? shardSize = null, object subAggregations = null)
         {
             return new Map("sampler", new Map
             {
@@ -559,7 +559,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object SignificantTerms(
+        public static Map SignificantTerms(
             string field, 
             bool? jlh = null,
             bool? chiSquare = null,
@@ -583,7 +583,7 @@ namespace SimpleElastic
         /// </summary>
         /// <param name="subAggregations">An optional set of sub aggregations for this aggregation.</param>
         /// <returns>An object representing the requested aggregation.</returns>
-        public static object SignificantText(object subAggregations = null)
+        public static Map SignificantText(object subAggregations = null)
         {
             return new Map("", new Map
             {
@@ -621,7 +621,7 @@ namespace SimpleElastic
         /// <returns>
         /// An object representing the requested aggregation.
         /// </returns>
-        public static object Terms(
+        public static Map Terms(
             string field = null,
             int? size = null,
             object order = null,
